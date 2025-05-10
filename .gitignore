@@ -1,0 +1,36 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build results
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Rider
+.idea/
+
+# User-specific files
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Others
+*.dbmdl
+*.bak
+*.log
+*.pdb
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
