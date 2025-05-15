@@ -1,48 +1,67 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../services/auth';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [lozinka, setLozinka] = useState("");
+  const [email, setEmail] = useState('');
+  const [lozinka, setLozinka] = useState('');
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const res = await api.post("/korisnik/login", { email, lozinka });
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("tipKorisnika", res.data.tipKorisnika);
-      navigate("/");
-    } catch {
-      alert("Neuspješna prijava. Provjerite podatke.");
+    const data = await login(email, lozinka);
+
+    if (data) {
+      switch (data.tip) {
+        case 0:
+          navigate('/admin');
+          break;
+        case 1:
+          navigate('/donator');
+          break;
+        case 2:
+          navigate('/primalac');
+          break;
+        case 3:
+          navigate('/volonter');
+          break;
+        default:
+          navigate('/');
+      }
+    } else {
+      alert('Pogrešan email ili lozinka');
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">Prijava</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-3 border border-gray-300 rounded mb-4"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Lozinka"
-          className="w-full p-3 border border-gray-300 rounded mb-4"
-          value={lozinka}
-          onChange={(e) => setLozinka(e.target.value)}
-          required
-        />
-        <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded transition">
-          Prijavi se
-        </button>
-      </form>
+    <div>
+      <div className="max-w-md mx-auto p-6">
+        <h2 className="text-2xl font-bold mb-4">Prijava</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="w-full border p-2 rounded"
+            placeholder="Email"
+            required
+          />
+          <input
+            type="password"
+            value={lozinka}
+            onChange={e => setLozinka(e.target.value)}
+            className="w-full border p-2 rounded"
+            placeholder="Lozinka"
+            required
+          />
+          <button type="submit" className="bg-pink-600 text-white px-4 py-2 rounded">
+            Prijavi se
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

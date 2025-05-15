@@ -1,7 +1,7 @@
-export default function Footer() {
+export function Footer() {
   return (
-    <footer className="bg-white border-t p-4 text-center text-sm text-gray-500">
-      © 2025 Charity Foundation. Sva prava zadržana.
+    <footer className="text-center py-4 bg-gray-100 mt-8 text-sm text-gray-500">
+      &copy; 2025 Charity Foundation. Sva prava zadržana.
     </footer>
   );
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using CharityFoundationBackend.Data;
 using CharityFoundationBackend.Models;
+using System.Linq;
 
 namespace CharityFoundationBackend.Controllers
 {
@@ -15,7 +16,15 @@ namespace CharityFoundationBackend.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public IActionResult Get() => Ok(_context.Donacije.ToList());
+        // GET: api/donacija/korisnik/3
+        [HttpGet("korisnik/{id}")]
+        public IActionResult GetByKorisnikId(int id)
+        {
+            var donacije = _context.Donacije
+                .Where(d => d.IdKorisnika == id)
+                .ToList();
+
+            return Ok(donacije);
+        }
     }
 }

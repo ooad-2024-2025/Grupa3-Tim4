@@ -1,8 +1,10 @@
 export default function Izvjestaji() {
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Izvještaji</h2>
-      <p className="text-gray-700">Mjesečni i godišnji izvještaji o donacijama.</p>
+      <Header />
+      <h2 className="text-2xl font-semibold p-6">Izvještaji o donacijama i pomoći</h2>
+      <p className="p-4 text-gray-600">Ovdje će ići statistike i analize.</p>
+      <Footer />
     </div>
   );
 }

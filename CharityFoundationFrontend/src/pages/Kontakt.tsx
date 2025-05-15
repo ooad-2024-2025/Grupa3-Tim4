@@ -1,8 +1,8 @@
 export default function Kontakt() {
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Kontaktirajte nas</h2>
-      <p className="text-gray-700">Pišite nam putem forme ili direktno na email.</p>
+      <h2 className="text-2xl font-bold p-6">Kontaktirajte nas</h2>
+      <p className="p-4">info@charity.com</p>
     </div>
   );
 }

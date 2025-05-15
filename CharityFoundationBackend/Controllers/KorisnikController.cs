@@ -35,11 +35,13 @@ namespace CharityFoundationBackend.Controllers
             if (korisnik == null)
                 return Unauthorized("Pogrešan email ili lozinka.");
 
-            return Ok(new
-            {
-                token = "fake-jwt-token",
-                tipKorisnika = korisnik.TipKorisnika.ToString().ToLower()
-            });
+           return Ok(new
+        {
+        id = korisnik.Id,
+        ime = korisnik.Ime,
+        tip = korisnik.TipKorisnika
+        });
+
         }
 
         // 👥 Prikaz svih korisnika (TEST only)

@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using CharityFoundationBackend.Data;
 
@@ -12,14 +15,25 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // 📦 Registruj sve kontrolere
 builder.Services.AddControllersWithViews();
-builder.Services.AddControllers(); // važno za ApiController
+builder.Services.AddControllers(); // Za [ApiController]
+
+// 🌐 Dodaj CORS za frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
-// 🌐 Middleware
+// 🧭 Middleware i greške
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage(); // prikaz detaljnih grešaka
+    app.UseDeveloperExceptionPage();
 }
 else
 {
@@ -32,12 +46,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization(); // koristi ako planiraš JWT/token auth
+app.UseCors("AllowFrontend"); // 🛡️ Omogući CORS
+
+app.UseAuthorization();
 
 // 🧭 Mapiranje API kontrolera
 app.MapControllers();
 
-// 🎯 Defaultna MVC ruta
+// 🌍 MVC ruta
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

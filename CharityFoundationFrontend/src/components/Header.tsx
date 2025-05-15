@@ -1,19 +1,24 @@
-export default function Header() {
-  return (
-    <header className="bg-white shadow p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Charity Foundation</h1>
-        <nav className="space-x-4">
-          <a href="/" className="hover:underline">Početna</a>
-          <a href="/donacije" className="hover:underline">Donacije</a>
-          <a href="/zahtjevi" className="hover:underline">Zahtjevi</a>
-          <a href="/izvjestaji" className="hover:underline">Izvještaji</a>
-          <a href="/kontakt" className="hover:underline">Kontakt</a>
-          <a href="/login" className="hover:underline">Login</a>
-<a href="/register" className="hover:underline">Register</a>
+import { Link } from 'react-router-dom';
+import { useAuth } from '../services/auth';
 
-        </nav>
-      </div>
+export function Header() {
+  const { user, logout } = useAuth();
+
+  return (
+    <header className="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
+      <h1 className="text-xl font-bold text-pink-600">Charity Foundation</h1>
+      <nav className="space-x-4">
+        <Link to="/" className="hover:text-pink-600">Početna</Link>
+        {user && user.tip === 1 && <Link to="/donacije" className="hover:text-pink-600">Moje Donacije</Link>}
+        {user && user.tip === 2 && <Link to="/zahtjevi" className="hover:text-pink-600">Moji Zahtjevi</Link>}
+        {user && user.tip === 3 && <Link to="/akcije" className="hover:text-pink-600">Moje Akcije</Link>}
+        <Link to="/kontakt" className="hover:text-pink-600">Kontakt</Link>
+        {user ? (
+          <button onClick={logout} className="bg-pink-500 text-white px-3 py-1 rounded">Odjava</button>
+        ) : (
+          <Link to="/login" className="bg-pink-500 text-white px-3 py-1 rounded">Prijava</Link>
+        )}
+      </nav>
     </header>
   );
 }

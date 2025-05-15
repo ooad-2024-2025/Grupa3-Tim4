@@ -84,12 +84,6 @@ npm run dev
 | Primalac pomoći | selma@pomoc.com        | pomoc123     | 3            |
 | Volonter       | vedad@volontira.com    | volonter123  | 4            |
 
-📌 `TipKorisnika` (enum):
-- `0` = Administrator
-- `1` = Donator
-- `3` = Primalac pomoći
-- `4` = Volonter
-
 ---
 
 ## 📋 Funkcionalnosti po korisniku
@@ -128,10 +122,4 @@ npm run dev
 
 ---
 
-## ⚠️ Napomena
-
-- Projekat **ne koristi seed** — svi podaci (korisnici, donacije, zahtjevi itd.) se unose **ručno preko SSMS-a**.
-- Login koristi **fiktivne JWT tokene** (`"fake-jwt-token"`) bez validacije — za potrebe prototipa.
-
----
 
