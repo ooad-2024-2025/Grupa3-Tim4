@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #1e40af; /* Indigo-800 */
+  --secondary: #facc15; /* Yellow-400 */
+  --text: #1f2937; /* Gray-800 */
+  --background: #f9fafb; /* Gray-50 */
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+input, select, textarea {
+  @apply w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500;
+  background-color: white;
+  color: #111827;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+input:-webkit-autofill {
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+form {
+  @apply bg-white p-8 rounded shadow-md w-full max-w-md mx-auto;
+}
+
+button {
+  @apply bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded transition w-full;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.container {
+  @apply max-w-6xl mx-auto px-4;
+}
+
+@media (max-width: 640px) {
+  form {
+    @apply p-6;
+  }
+
+  input, select, textarea {
+    @apply text-sm;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+
+  button {
+    @apply text-sm;
+  }
+}
