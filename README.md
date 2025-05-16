@@ -1,4 +1,3 @@
-
 # 🎗️ Charity Foundation
 
 Kompletna full-stack aplikacija za upravljanje humanitarnim donacijama, zahtjevima za pomoć, volonterima i izvještajima. Omogućava efikasno povezivanje donatora, volontera i korisnika kojima je potrebna pomoć.
@@ -16,13 +15,13 @@ Kompletna full-stack aplikacija za upravljanje humanitarnim donacijama, zahtjevi
 
 ## 🧰 Potrebni alati
 
-| Alat                        | Opis                                   | Link |
-|----------------------------|----------------------------------------|------|
-| [.NET SDK 8+](https://dotnet.microsoft.com/en-us/download) | Pokretanje backend servera         | ✅   |
-| [Node.js v18+](https://nodejs.org)             | Pokretanje frontend aplikacije     | ✅   |
-| [SQL Server Express](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) | Lokalna baza podataka              | ✅   |
-| [SSMS](https://aka.ms/ssmsfullsetup)           | GUI za bazu                        | ✅   |
-| [Visual Studio Code](https://code.visualstudio.com) | Editor za kod (opcionalno)         | ✅   |
+| Alat                                                                                  | Opis                           | Link |
+| ------------------------------------------------------------------------------------- | ------------------------------ | ---- |
+| [.NET SDK 8+](https://dotnet.microsoft.com/en-us/download)                            | Pokretanje backend servera     | ✅   |
+| [Node.js v18+](https://nodejs.org)                                                    | Pokretanje frontend aplikacije | ✅   |
+| [SQL Server Express](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) | Lokalna baza podataka          | ✅   |
+| [SSMS](https://aka.ms/ssmsfullsetup)                                                  | GUI za bazu                    | ✅   |
+| [Visual Studio Code](https://code.visualstudio.com)                                   | Editor za kod (opcionalno)     | ✅   |
 
 ---
 
@@ -46,7 +45,7 @@ cd CharityFoundationBackend
 dotnet ef database update
 ```
 
-5. Ručno unesi sample podatke (npr. korisnike) preko SSMS-a.
+5. Pokreni `DatabaseSetup.sql` iz foldera `CharityFoundationBackend` putem SSMS-a kako bi unio početne podatke.
 
 ---
 
@@ -77,34 +76,38 @@ npm run dev
 
 ## 🔐 Testni korisnici (uneseni ručno u bazu)
 
-| Uloga             | Email                  | Lozinka      | TipKorisnika |
-|------------------|------------------------|--------------|--------------|
-| Administrator  | admin@charity.com      | admin123     | 0            |
-| Donator        | dino@donacije.com      | donator123   | 1            |
-| Primalac pomoći | selma@pomoc.com        | pomoc123     | 3            |
-| Volonter       | vedad@volontira.com    | volonter123  | 4            |
+| Uloga           | Email               | Lozinka     | TipKorisnika |
+| --------------- | ------------------- | ----------- | ------------ |
+| Administrator   | admin@charity.com   | admin123    | 0            |
+| Donator         | dino@donacije.com   | donator123  | 1            |
+| Primalac pomoći | selma@pomoc.com     | pomoc123    | 3            |
+| Volonter        | vedad@volontira.com | volonter123 | 4            |
 
 ---
 
 ## 📋 Funkcionalnosti po korisniku
 
 ### Administrator
+
 - Pristup svim korisnicima
 - Pregled i raspodjela donacija
 - Upravljanje izvještajima i obavijestima
 - Praćenje aktivnosti volontera
 
 ### Donator
+
 - Kreira donacije
 - Prati status vlastitih donacija
 - Pregled rang liste najaktivnijih donatora
 
 ### Primalac pomoći
+
 - Kreira zahtjeve
 - Vidi status zahtjeva
 - Komunikacija sa sistemom
 
 ### Volonter
+
 - Prijavljuje se na volonterske akcije
 - Vidi zadatke i obaveze
 - Upravljanje ličnim učešćima
@@ -113,13 +116,11 @@ npm run dev
 
 ## 📬 API Pregled (primjeri)
 
-| Endpoint                  | Metod | Opis                         |
-|--------------------------|-------|------------------------------|
-| `/api/korisnik`          | GET   | Prikaz svih korisnika       |
-| `/api/donacija`          | GET   | Prikaz svih donacija        |
-| `/api/zahtjev`           | GET   | Prikaz zahtjeva za pomoć    |
-| `/api/akcija`            | GET   | Prikaz volonterskih akcija  |
+| Endpoint        | Metod | Opis                       |
+| --------------- | ----- | -------------------------- |
+| `/api/korisnik` | GET   | Prikaz svih korisnika      |
+| `/api/donacija` | GET   | Prikaz svih donacija       |
+| `/api/zahtjev`  | GET   | Prikaz zahtjeva za pomoć   |
+| `/api/akcija`   | GET   | Prikaz volonterskih akcija |
 
 ---
-
-
