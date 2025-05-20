@@ -90,7 +90,7 @@ npm run dev
 ### Administrator
 
 - Pristup svim korisnicima
-- Pregled i raspodjela donacija
+- Pregled i raspodjela donacija i akcija
 - Upravljanje izvještajima i obavijestima
 - Praćenje aktivnosti volontera
 
@@ -114,13 +114,3 @@ npm run dev
 
 ---
 
-## 📬 API Pregled (primjeri)
-
-| Endpoint        | Metod | Opis                       |
-| --------------- | ----- | -------------------------- |
-| `/api/korisnik` | GET   | Prikaz svih korisnika      |
-| `/api/donacija` | GET   | Prikaz svih donacija       |
-| `/api/zahtjev`  | GET   | Prikaz zahtjeva za pomoć   |
-| `/api/akcija`   | GET   | Prikaz volonterskih akcija |
-
----

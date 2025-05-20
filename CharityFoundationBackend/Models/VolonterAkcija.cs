@@ -9,13 +9,12 @@ namespace CharityFoundationBackend.Models
     }
 
     public class VolonterAkcija
-{
-    public int Id { get; set; }
-    public int IdVolontera { get; set; }
-    public int AkcijaID { get; set; }
-    public StatusUcesca StatusUcesca { get; set; }
+    {
+        public int Id { get; set; }
+        public int IdVolontera { get; set; }
+        public int AkcijaID { get; set; }
+        public StatusUcesca StatusUcesca { get; set; }
 
-    public Akcija Akcija { get; set; } // navigacija
-}
-
+        public Akcija Akcija { get; set; } = new Akcija(); // navigacija (ne-nullable fix)
+    }
 }

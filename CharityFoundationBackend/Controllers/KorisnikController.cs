@@ -1,6 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using CharityFoundationBackend.Data;
 using CharityFoundationBackend.Models;
+using CharityFoundationBackend.Services;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CharityFoundationBackend.Controllers
 {
@@ -9,10 +14,12 @@ namespace CharityFoundationBackend.Controllers
     public class KorisnikController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly JwtService _jwtService;
 
-        public KorisnikController(AppDbContext context)
+        public KorisnikController(AppDbContext context, JwtService jwtService)
         {
             _context = context;
+            _jwtService = jwtService;
         }
 
         // 📥 Registracija
@@ -27,30 +34,62 @@ namespace CharityFoundationBackend.Controllers
             return Ok("Registracija uspješna.");
         }
 
-        // 🔐 Login
+        // 🔐 Login sa JWT tokenom
         [HttpPost("login")]
+        [AllowAnonymous]
         public IActionResult Login([FromBody] LoginModel model)
         {
-            var korisnik = _context.Korisnici.FirstOrDefault(k => k.Email == model.Email && k.Lozinka == model.Lozinka);
+            var korisnik = _context.Korisnici
+                .FirstOrDefault(k => k.Email == model.Email && k.Lozinka == model.Lozinka);
+
             if (korisnik == null)
                 return Unauthorized("Pogrešan email ili lozinka.");
 
-           return Ok(new
-        {
-        id = korisnik.Id,
-        ime = korisnik.Ime,
-        tip = korisnik.TipKorisnika
-        });
+            var token = _jwtService.GenerateToken(korisnik);
 
+            return Ok(new
+            {
+                token,
+                korisnik = new
+                {
+                    korisnik.Id,
+                    korisnik.Ime,
+                    korisnik.Prezime,
+                    korisnik.Email,
+                    uloga = korisnik.TipKorisnika.ToString()
+                }
+            });
         }
 
         // 👥 Prikaz svih korisnika (TEST only)
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public IActionResult GetAllKorisnici()
         {
             var korisnici = _context.Korisnici.ToList();
             return Ok(korisnici);
         }
+
+        // 🛠️ Ažuriranje korisnika (ADMIN)
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> UpdateKorisnik(int id, [FromBody] Korisnik korisnik)
+        {
+            if (id != korisnik.Id)
+                return BadRequest();
+
+            var postoji = await _context.Korisnici.AnyAsync(k => k.Id == id);
+            if (!postoji)
+                return NotFound();
+
+            _context.Entry(korisnik).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        
+
+
     }
 
     public class LoginModel

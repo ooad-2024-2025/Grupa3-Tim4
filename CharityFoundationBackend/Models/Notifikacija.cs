@@ -12,7 +12,7 @@ namespace CharityFoundationBackend.Models
     {
         public int Id { get; set; }
         public int IdKorisnika { get; set; }
-        public string Sadrzaj { get; set; }
+        public string Sadrzaj { get; set; } = string.Empty; 
         public TipNotifikacije Tip { get; set; }
         public DateTime Datum { get; set; }
     }

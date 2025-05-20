@@ -1,23 +1,27 @@
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using CharityFoundationBackend.Services;
+using System.Text;
 using CharityFoundationBackend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔗 Konekcija na SQL Server
+// 📦 1. Konekcija na bazu
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// 📦 Registruj sve kontrolere
+// 📦 2. Kontroleri i MVC
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers(); // Za [ApiController]
+builder.Services.AddScoped<JwtService>();
 
-// 🌐 Dodaj CORS za frontend
+// 🌐 3. CORS (omogućava React frontend)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -28,9 +32,37 @@ builder.Services.AddCors(options =>
     });
 });
 
+// 🔐 4. JWT autentikacija
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            IssuerSigningKey = key
+        };
+    });
+
+// 🧠 5. Role-based authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("DonatorPolicy", policy => policy.RequireRole("Donator"));
+    options.AddPolicy("PrimalacPolicy", policy => policy.RequireRole("Primalac"));
+    options.AddPolicy("VolonterPolicy", policy => policy.RequireRole("Volonter"));
+});
+
 var app = builder.Build();
 
-// 🧭 Middleware i greške
+// 🧭 6. Error handling i routing
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -46,14 +78,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseCors("AllowFrontend"); // 🛡️ Omogući CORS
+// 🛡️ 7. Middleware za CORS i autentikaciju
+app.UseCors("AllowFrontend");
 
+app.UseAuthentication(); // ⬅️ Mora biti prije Authorization
 app.UseAuthorization();
 
-// 🧭 Mapiranje API kontrolera
-app.MapControllers();
+// 🧭 8. Mape
+app.MapControllers(); // API kontrolleri
 
-// 🌍 MVC ruta
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

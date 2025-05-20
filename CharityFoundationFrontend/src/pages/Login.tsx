@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../services/auth';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -14,18 +12,18 @@ export default function Login() {
     e.preventDefault();
     const data = await login(email, lozinka);
 
-    if (data) {
-      switch (data.tip) {
-        case 0:
+    if (data && typeof data !== "boolean") {
+      switch (data.ime) {
+        case "Admin":
           navigate('/admin');
           break;
-        case 1:
+        case "Dino":
           navigate('/donator');
           break;
-        case 2:
+        case "Selma":
           navigate('/primalac');
           break;
-        case 3:
+        case "Vedad":
           navigate('/volonter');
           break;
         default:

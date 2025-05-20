@@ -1,39 +1,70 @@
-import { useState } from 'react';
-import { useAuth } from '../services/auth';
+import React, { useState } from "react";
+import axios from "axios";
 
-export function DonacijaForm() {
-  const [opis, setOpis] = useState('');
-  const { user } = useAuth();
+interface DonacijaFormProps {
+  korisnikId: number;
+  onDonacijaAdded: () => void; // callback za osvježenje
+}
+
+const DonacijaForm: React.FC<DonacijaFormProps> = ({
+  korisnikId,
+  onDonacijaAdded,
+}) => {
+  const [iznos, setIznos] = useState("");
+  const [vrstaPomoci, setVrstaPomoci] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('/api/donacije', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ opis, korisnikId: user?.id })
-    });
-    setOpis('');
-    alert('Donacija poslana.');
+
+    try {
+      await axios.post("/api/donacija", {
+        idKorisnika: korisnikId,
+        iznos: parseFloat(iznos),
+        vrstaPomoci,
+      });
+
+      alert("Donacija uspješno dodana!");
+      setIznos("");
+      setVrstaPomoci("");
+      onDonacijaAdded(); // osvježi listu
+    } catch (error) {
+      console.error("Greška:", error);
+      alert("Greška pri slanju donacije.");
+    }
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <Header />
-      <h2 className="text-2xl font-semibold mb-4">Nova Donacija</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <textarea
-          value={opis}
-          onChange={e => setOpis(e.target.value)}
-          className="w-full border p-2 rounded"
-          rows={4}
-          placeholder="Unesite opis donacije"
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 p-4 bg-white rounded shadow"
+    >
+      <div>
+        <label className="block font-semibold">Iznos (KM):</label>
+        <input
+          type="number"
+          value={iznos}
+          onChange={(e) => setIznos(e.target.value)}
+          className="input w-full border p-2"
           required
         />
-        <button type="submit" className="bg-pink-600 text-white px-4 py-2 rounded">Pošalji</button>
-      </form>
-      <Footer />
-    </div>
+      </div>
+      <div>
+        <label className="block font-semibold">Vrsta pomoći:</label>
+        <input
+          value={vrstaPomoci}
+          onChange={(e) => setVrstaPomoci(e.target.value)}
+          className="input w-full border p-2"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        className="btn bg-blue-600 text-white px-4 py-2 rounded"
+      >
+        Dodaj donaciju
+      </button>
+    </form>
   );
-}
+};
+
+export default DonacijaForm;

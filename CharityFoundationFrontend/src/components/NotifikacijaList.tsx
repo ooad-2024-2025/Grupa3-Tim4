@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Header } from './Header';
+import { Footer } from './Footer';
 
 export function NotifikacijaList() {
   const [notifikacije, setNotifikacije] = useState([]);

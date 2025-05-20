@@ -1,12 +1,21 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../services/auth';
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../services/auth";
 
-export function ProtectedRoute({ children, allowed }: { children: JSX.Element, allowed: number[] }) {
+type Props = {
+  children: React.ReactNode;
+  allowed: string[]; // npr. ["Administrator"]
+};
+
+export const ProtectedRoute = ({ children, allowed }: Props) => {
   const { user, isLoading } = useAuth();
 
-  if (isLoading) return null; // ⏳ čeka učitavanje
-  if (!user) return <Navigate to="/login" replace />;
-  if (!allowed.includes(user.tip)) return <Navigate to="/" replace />;
+  if (isLoading) return <div>Učitavanje...</div>;
 
-  return children;
-}
+  if (!user) return <Navigate to="/login" replace />;
+
+  if (!allowed.includes(user.uloga)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
