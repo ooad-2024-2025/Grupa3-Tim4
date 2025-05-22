@@ -29,7 +29,7 @@ cd CharityFoundation
 dotnet run
 ```
 
-🔗 Otvara se na: `http://localhost:3000`
+🔗 Otvara se na: `https://localhost:3000`
 
 ---
 
