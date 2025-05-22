@@ -35,12 +35,12 @@ dotnet run
 
 ## 🔐 Testni korisnici (uneseni u bazu)
 
-| Uloga           | Email               | Lozinka     | TipKorisnika |
-| --------------- | ------------------- | ----------- | ------------ |
-| Administrator   | admin@admin.com   | Admin123!    | 0            |
-| Donator         | dino@donator.com   | Donator123!  | 1            |
-| Primalac pomoći | tarik@primalac.com     | Primalac123!    | 3            |
-| Volonter        | vedad@volonter.com | Volonter123! | 4            |
+| Uloga           | Email               | Lozinka     | 
+| --------------- | ------------------- | ----------- | 
+| Administrator   | admin@admin.com   | Admin123!    | 
+| Donator         | dino@donator.com   | Donator123!  | 
+| Primalac pomoći | tarik@primalac.com     | Primalac123!    | 
+| Volonter        | vedad@volonter.com | Volonter123! |
 
 ---
 
