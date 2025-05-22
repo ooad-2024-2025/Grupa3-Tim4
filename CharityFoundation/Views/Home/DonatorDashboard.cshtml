@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Dashboard - Donator";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            <h2 class="card-title text-primary"><i class="bi bi-person-heart"></i> Dobrodošli, Donator!</h2>
+            <p class="text-muted">Ovdje možete pregledati svoje donacije i kreirati nove.</p>
+
+            <div class="d-flex justify-content-end mt-4">
+                <a asp-controller="Donacija" asp-action="Create" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Nova Donacija
+                </a>
+            </div>
+
+            <div class="mt-4">
+                <a asp-controller="Donacija" asp-action="Index" class="btn btn-outline-primary">
+                    <i class="bi bi-table"></i> Pregledaj Donacije
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

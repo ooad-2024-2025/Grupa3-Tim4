@@ -1,0 +1,77 @@
+@* Korisnik/Create.cshtml - dodavanje novog korisnika *@
+@model CharityFoundation.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Dodaj Korisnika";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Dodaj Novog Korisnika</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div class="mb-3">
+                            <label asp-for="Ime" class="form-label"></label>
+                            <input asp-for="Ime" class="form-control" />
+                            <span asp-validation-for="Ime" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Prezime" class="form-label"></label>
+                            <input asp-for="Prezime" class="form-control" />
+                            <span asp-validation-for="Prezime" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TipKorisnika" class="form-label"></label>
+                            <select asp-for="TipKorisnika" class="form-select">
+                                <option value="Administrator">Administrator</option>
+                                <option value="Donator">Donator</option>
+                                <option value="PrimalacPomoci">PrimalacPomoci</option>
+                                <option value="Volonter">Volonter</option>
+                            </select>
+                            <span asp-validation-for="TipKorisnika" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Lozinka</label>
+                            <input name="Password" type="password" class="form-control" required />
+                        </div>
+
+                        <button type="submit" class="btn btn-outline-primary">Dodaj Korisnika</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Nazad</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f4f9ff;
+        }
+        .card {
+            border-radius: 1rem;
+        }
+        .card-header {
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+    </style>
+}

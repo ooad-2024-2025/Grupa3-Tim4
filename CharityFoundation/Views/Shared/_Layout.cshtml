@@ -1,0 +1,120 @@
+﻿@* Views/Shared/_Layout.cshtml - Navigacija po ulogama *@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CharityFoundation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/site.css" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">CharityFoundation</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Početna</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Contact">Kontakt</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="About">O nama</a>
+                        </li>
+
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            @* Administrator *@
+                            if (User.IsInRole("Administrator"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Home" asp-action="AdminDashboard">Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Korisnik" asp-action="Index">Korisnici</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Donacija" asp-action="Index">Donacije</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Zahtjev" asp-action="Index">Zahtjevi</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Akcija" asp-action="Index">Akcije</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Izvjestaj" asp-action="Index">Izvještaji</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("Donator"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Home" asp-action="DonatorDashboard">Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Donacija" asp-action="Index">Moje Donacije</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("PrimalacPomoci"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Home" asp-action="PrimalacDashboard">Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Zahtjev" asp-action="Index">Moji Zahtjevi</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("Volonter"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Home" asp-action="VolonterDashboard">Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Akcija" asp-action="Index">Moje Akcije</a>
+                                </li>
+                            }
+
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-link nav-link">Logout</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="text-center py-3 text-muted">
+        <hr />
+        <p>&copy; 2025 - Charity Foundation</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

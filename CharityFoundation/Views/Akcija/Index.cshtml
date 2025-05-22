@@ -1,0 +1,55 @@
+@* Akcija/Index.cshtml - pregled volonterskih akcija za volontera *@
+@model IEnumerable<CharityFoundation.Models.VolonterAkcija>
+
+@{
+    ViewData["Title"] = "Moje Akcije";
+}
+
+<div class="container py-4">
+    <h2 class="text-primary mb-4">Moje Volonterske Akcije</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Niste trenutno prijavljeni ni na jednu akciju.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Naziv Akcije</th>
+                        <th>Opis</th>
+                        <th>Datum</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var ucesce in Model)
+                {
+                    <tr>
+                        <td>@ucesce.Akcija.Naziv</td>
+                        <td>@ucesce.Akcija.Opis</td>
+                        <td>@ucesce.Akcija.Datum.ToString("dd.MM.yyyy")</td>
+                        <td><span class="badge bg-secondary">@ucesce.StatusUcesca</span></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h2 {
+            font-weight: 600;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+}

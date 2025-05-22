@@ -1,0 +1,63 @@
+@* Korisnik/Index.cshtml - administracija korisnika *@
+@model IEnumerable<CharityFoundation.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Korisnici";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Svi Korisnici</h2>
+        <a asp-action="Create" class="btn btn-outline-primary">Dodaj novog korisnika</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">Nema registrovanih korisnika.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ime i Prezime</th>
+                        <th>Email</th>
+                        <th>Tip Korisnika</th>
+                        <th>Akcije</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var korisnik in Model)
+                {
+                    <tr>
+                        <td>@korisnik.Ime @korisnik.Prezime</td>
+                        <td>@korisnik.Email</td>
+                        <td>@korisnik.TipKorisnika</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@korisnik.Id" class="btn btn-sm btn-outline-warning">Uredi</a>
+                            <form asp-action="Delete" asp-route-id="@korisnik.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Da li ste sigurni?')">Obriši</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h2 {
+            font-weight: 600;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+}

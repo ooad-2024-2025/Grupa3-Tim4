@@ -1,0 +1,74 @@
+@* Izvjestaj/Index.cshtml - pregled izvještaja po korisniku ili za sve korisnike (admin) *@
+@model IEnumerable<CharityFoundation.Models.Izvjestaj>
+
+@{
+    ViewData["Title"] = "Izvještaji";
+}
+
+<div class="container py-4">
+    <h2 class="text-primary mb-4">Izvještaji</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Nema dostupnih izvještaja.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mjesec</th>
+                        <th>Godina</th>
+                        <th>Datum Izvještaja</th>
+                        <th>Opis</th>
+                        <th>Ukupna Vrijednost</th>
+                        <th>Broj Stavki</th>
+                        <th>Korisnik</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var izvjestaj in Model)
+                {
+                    <tr>
+                        <td>@izvjestaj.Mjesec</td>
+                        <td>@izvjestaj.Godina</td>
+                        <td>@izvjestaj.Datum.ToString("dd.MM.yyyy")</td>
+                        <td>@izvjestaj.Opis</td>
+                        <td>@izvjestaj.UkupnaVrijednost.ToString("0.00") KM</td>
+                        <td>
+                            @if (izvjestaj.BrojDonacija > 0)
+                            {
+                                @:Donacija: @izvjestaj.BrojDonacija
+                            }
+                            else if (izvjestaj.Opis.ToLower().Contains("akcija"))
+                            {
+                                @:Akcija
+                            }
+                            else if (izvjestaj.Opis.ToLower().Contains("zahtjev"))
+                            {
+                                @:Zahtjev
+                            }
+                        </td>
+                        <td>@izvjestaj.Korisnik?.Ime @izvjestaj.Korisnik?.Prezime</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h2 {
+            font-weight: 600;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+}

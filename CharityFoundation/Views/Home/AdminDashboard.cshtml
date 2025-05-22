@@ -1,0 +1,78 @@
+@* Home/AdminDashboard.cshtml - Admin funkcionalnosti *@
+@{
+    ViewData["Title"] = "Dashboard - Administrator";
+}
+
+<div class="container py-5">
+    <h2 class="text-primary mb-4">Dobrodošli, Administrator!</h2>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a asp-controller="Korisnik" asp-action="Index" class="text-decoration-none">
+                <div class="card dashboard-card text-center p-4">
+                    <div class="dashboard-icon text-primary mb-2">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5>Korisnici</h5>
+                    <p class="text-muted">Pregled i upravljanje korisnicima</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Donacija" asp-action="Index" class="text-decoration-none">
+                <div class="card dashboard-card text-center p-4">
+                    <div class="dashboard-icon text-success mb-2">
+                        <i class="bi bi-cash-coin"></i>
+                    </div>
+                    <h5>Donacije</h5>
+                    <p class="text-muted">Sve donacije u sistemu</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Zahtjev" asp-action="Index" class="text-decoration-none">
+                <div class="card dashboard-card text-center p-4">
+                    <div class="dashboard-icon text-danger mb-2">
+                        <i class="bi bi-envelope-open"></i>
+                    </div>
+                    <h5>Zahtjevi</h5>
+                    <p class="text-muted">Pregled i odobravanje zahtjeva</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Akcija" asp-action="Index" class="text-decoration-none">
+                <div class="card dashboard-card text-center p-4">
+                    <div class="dashboard-icon text-warning mb-2">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <h5>Akcije</h5>
+                    <p class="text-muted">Upravljanje volonterskim akcijama</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Izvjestaj" asp-action="Index" class="text-decoration-none">
+                <div class="card dashboard-card text-center p-4">
+                    <div class="dashboard-icon text-info mb-2">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h5>Izvještaji</h5>
+                    <p class="text-muted">Statistički prikaz podataka</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fc;
+        }
+    </style>
+}

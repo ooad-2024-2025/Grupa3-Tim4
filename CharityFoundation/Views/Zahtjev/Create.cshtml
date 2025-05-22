@@ -1,0 +1,57 @@
+@* Zahtjev/Create.cshtml - unos novog zahtjeva za pomoć *@
+@model CharityFoundation.Models.ZahtjevZaPomoc
+
+@{
+    ViewData["Title"] = "Novi Zahtjev";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Novi Zahtjev za Pomoć</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div class="mb-3">
+                            <label asp-for="Opis" class="form-label"></label>
+                            <textarea asp-for="Opis" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Opis" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Urgentnost" class="form-label"></label>
+                            <select asp-for="Urgentnost" class="form-select">
+                                <option value="1">Niska</option>
+                                <option value="2">Srednja</option>
+                                <option value="3">Visoka</option>
+                            </select>
+                            <span asp-validation-for="Urgentnost" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary">Pošalji Zahtjev</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Nazad</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f4f9ff;
+        }
+        .card {
+            border-radius: 1rem;
+        }
+        .card-header {
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+    </style>
+}

@@ -6,9 +6,9 @@ Kompletna full-stack aplikacija za upravljanje humanitarnim donacijama, zahtjevi
 
 ## 🔧 Tehnologije
 
-- **Backend**: ASP.NET Core (.NET 8)
-- **Frontend**: React + Vite + TypeScript
-- **Baza**: Microsoft SQL Server Express
+- **Backend**: ASP.NET Core MVC (.NET 8)
+- **Frontend**: Razor Views (MVC)
+- **Baza**: Microsoft SQL Server (Cloud)
 - **ORM**: Entity Framework Core
 
 ---
@@ -18,70 +18,29 @@ Kompletna full-stack aplikacija za upravljanje humanitarnim donacijama, zahtjevi
 | Alat                                                                                  | Opis                           | Link |
 | ------------------------------------------------------------------------------------- | ------------------------------ | ---- |
 | [.NET SDK 8+](https://dotnet.microsoft.com/en-us/download)                            | Pokretanje backend servera     | ✅   |
-| [Node.js v18+](https://nodejs.org)                                                    | Pokretanje frontend aplikacije | ✅   |
-| [SQL Server Express](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) | Lokalna baza podataka          | ✅   |
-| [SSMS](https://aka.ms/ssmsfullsetup)                                                  | GUI za bazu                    | ✅   |
 | [Visual Studio Code](https://code.visualstudio.com)                                   | Editor za kod (opcionalno)     | ✅   |
-
----
-
-## 🛠️ Setup lokalne baze (SQL Server)
-
-1. Pokreni SQL Server Express i otvori **SQL Server Management Studio (SSMS)**.
-2. Kreiraj novu bazu:
-   - Naziv: `CharityFoundationDB`
-3. U fajlu `appsettings.json` unutar `CharityFoundationBackend`, postavi konekciju:
-
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=CharityFoundationDB;Trusted_Connection=True;TrustServerCertificate=True;"
-}
-```
-
-4. U konzoli pokreni migracije:
-
-```bash
-cd CharityFoundationBackend
-dotnet ef database update
-```
-
-5. Pokreni `DatabaseSetup.sql` iz foldera `CharityFoundationBackend` putem SSMS-a kako bi unio početne podatke.
 
 ---
 
 ## 🚀 Pokretanje projekta
 
-### ▶️ Backend
-
 ```bash
-cd CharityFoundationBackend
+cd CharityFoundation
 dotnet run
 ```
 
-🔗 Otvara se na: `http://localhost:5000`
+🔗 Otvara se na: `http://localhost:3000`
 
 ---
 
-### 💻 Frontend
-
-```bash
-cd CharityFoundationFrontend
-npm install
-npm run dev
-```
-
-🌐 Otvara se na: `http://localhost:3000`
-
----
-
-## 🔐 Testni korisnici (uneseni ručno u bazu)
+## 🔐 Testni korisnici (uneseni u bazu)
 
 | Uloga           | Email               | Lozinka     | TipKorisnika |
 | --------------- | ------------------- | ----------- | ------------ |
-| Administrator   | admin@charity.com   | admin123    | 0            |
-| Donator         | dino@donacije.com   | donator123  | 1            |
-| Primalac pomoći | selma@pomoc.com     | pomoc123    | 3            |
-| Volonter        | vedad@volontira.com | volonter123 | 4            |
+| Administrator   | admin@admin.com   | Admin123!    | 0            |
+| Donator         | dino@donator.com   | Donator123!  | 1            |
+| Primalac pomoći | tarik@primalac.com     | Primalac123!    | 3            |
+| Volonter        | vedad@volonter.com | Volonter123! | 4            |
 
 ---
 
@@ -89,28 +48,27 @@ npm run dev
 
 ### Administrator
 
-- Pristup svim korisnicima
-- Pregled i raspodjela donacija i akcija
-- Upravljanje izvještajima i obavijestima
-- Praćenje aktivnosti volontera
+- Upravljanje korisnicima
+- Upravljanje donacijama
+- Upravljanje zahtjevima za pomoć
+- Upravljanje akcijama
+- Upravljanje izvještajima
 
 ### Donator
 
 - Kreira donacije
-- Prati status vlastitih donacija
-- Pregled rang liste najaktivnijih donatora
+- Pregled svojih donacija
 
 ### Primalac pomoći
 
 - Kreira zahtjeve
+- Pregled svojih zahtjeva
 - Vidi status zahtjeva
-- Komunikacija sa sistemom
 
 ### Volonter
 
-- Prijavljuje se na volonterske akcije
+- Pregled akcija na koje je prijavljen
 - Vidi zadatke i obaveze
-- Upravljanje ličnim učešćima
 
 ---
 

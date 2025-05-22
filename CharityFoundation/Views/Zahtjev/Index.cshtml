@@ -1,0 +1,65 @@
+@* Zahtjev/Index.cshtml - pregled i upravljanje zahtjevima primaoca pomoći *@
+@model IEnumerable<CharityFoundation.Models.ZahtjevZaPomoc>
+
+@{
+    ViewData["Title"] = "Moji Zahtjevi";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Moji Zahtjevi</h2>
+        <a asp-action="Create" class="btn btn-outline-primary">Novi Zahtjev</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Nemate nijedan zahtjev za pomoć.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Opis</th>
+                        <th>Urgentnost</th>
+                        <th>Status</th>
+                        <th>Datum</th>
+                        <th>Akcije</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var zahtjev in Model)
+                {
+                    <tr>
+                        <td>@zahtjev.Opis</td>
+                        <td>@zahtjev.Urgentnost</td>
+                        <td><span class="badge bg-secondary">@zahtjev.Status</span></td>
+                        <td>@zahtjev.Datum.ToString("dd.MM.yyyy")</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@zahtjev.Id" class="btn btn-sm btn-outline-info">Detalji</a>
+                            <form asp-action="Delete" asp-route-id="@zahtjev.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Jeste li sigurni da želite obrisati zahtjev?')">Obriši</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h2 {
+            font-weight: 600;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+}
