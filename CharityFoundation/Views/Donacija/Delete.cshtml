@@ -1,0 +1,42 @@
+@model CharityFoundation.Models.Donacija
+
+@{
+    ViewData["Title"] = "Obriši Donaciju";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Potvrda Brisanja</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-4">Da li ste sigurni da želite obrisati donaciju?</h5>
+
+                    <dl class="row">
+                        <dt class="col-sm-4">Vrsta pomoći</dt>
+                        <dd class="col-sm-8">@Model.VrstaPomoci</dd>
+
+                        <dt class="col-sm-4">Iznos</dt>
+                        <dd class="col-sm-8">@Model.Iznos.ToString("0.00") KM</dd>
+
+                        <dt class="col-sm-4">Datum</dt>
+                        <dd class="col-sm-8">@Model.DatumDonacije.ToString("dd.MM.yyyy")</dd>
+
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">@Model.Status</dd>
+                    </dl>
+
+                    <form asp-action="DeleteConfirmed" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">Otkaži</a>
+                            <button type="submit" class="btn btn-outline-danger">Obriši</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

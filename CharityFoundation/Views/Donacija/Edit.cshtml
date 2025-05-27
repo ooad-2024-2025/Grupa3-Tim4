@@ -1,19 +1,19 @@
-@* Donacija/Create.cshtml - unos nove donacije *@
 @model CharityFoundation.Models.Donacija
 
 @{
-    ViewData["Title"] = "Nova Donacija";
+    ViewData["Title"] = "Uredi Donaciju";
 }
 
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Nova Donacija</h4>
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0">Uredi Donaciju</h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Create" method="post">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                         <div class="mb-3">
@@ -30,7 +30,7 @@
 
                         <div class="d-flex justify-content-between">
                             <a asp-action="Index" class="btn btn-secondary">Nazad</a>
-                            <button type="submit" class="btn btn-outline-primary">Doniraj</button>
+                            <button type="submit" class="btn btn-outline-warning">Spremi izmjene</button>
                         </div>
                     </form>
                 </div>
@@ -41,21 +41,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-}
-
-@section Styles {
-    <style>
-        body {
-            background-color: #f4f9ff;
-        }
-
-        .card {
-            border-radius: 1rem;
-        }
-
-        .card-header {
-            border-top-left-radius: 1rem;
-            border-top-right-radius: 1rem;
-        }
-    </style>
 }

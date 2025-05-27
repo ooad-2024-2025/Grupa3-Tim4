@@ -7,7 +7,7 @@ using CharityFoundation.Models;
 
 namespace CharityFoundation.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator,Donator")]
     public class DonacijaController : Controller
     {
         private readonly AppDbContext _context;
@@ -82,22 +82,34 @@ namespace CharityFoundation.Controllers
         }
 
         public async Task<IActionResult> Details(int id)
-        {
-            var donacija = await _context.Donacije
-                .Include(d => d.Korisnik)
-                .FirstOrDefaultAsync(m => m.Id == id);
+{
+    var user = await _userManager.GetUserAsync(User);
+    var donacija = await _context.Donacije
+        .Include(d => d.Korisnik)
+        .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (donacija == null)
-                return NotFound();
+    if (donacija == null)
+        return NotFound();
 
-            return View(donacija);
-        }
+    // ✅ Donator može samo svoje donacije gledati
+    if (user.TipKorisnika == "Donator" && donacija.KorisnikId != user.Id)
+        return Forbid();
+
+    // ✅ Administrator može sve vidjeti
+    return View(donacija);
+}
+
 
         public async Task<IActionResult> Edit(int id)
         {
+            var user = await _userManager.GetUserAsync(User);
             var donacija = await _context.Donacije.FindAsync(id);
+
             if (donacija == null)
                 return NotFound();
+
+            if (user == null || user.TipKorisnika != "Donator" || donacija.KorisnikId != user.Id)
+                return Forbid();
 
             return View(donacija);
         }
@@ -106,13 +118,28 @@ namespace CharityFoundation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Donacija donacija)
         {
-            if (id != donacija.Id)
-                return NotFound();
+            var user = await _userManager.GetUserAsync(User);
+
+            if (id != donacija.Id || user == null || user.TipKorisnika != "Donator")
+                return Forbid();
+
+            var postojeca = await _context.Donacije.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
+            if (postojeca == null || postojeca.KorisnikId != user.Id)
+                return Forbid();
 
             if (ModelState.IsValid)
             {
-                _context.Update(donacija);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    donacija.KorisnikId = user.Id;
+                    _context.Update(donacija);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return NotFound();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -121,12 +148,16 @@ namespace CharityFoundation.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
+            var user = await _userManager.GetUserAsync(User);
             var donacija = await _context.Donacije
                 .Include(d => d.Korisnik)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (donacija == null)
                 return NotFound();
+
+            if (user == null || user.TipKorisnika != "Donator" || donacija.KorisnikId != user.Id)
+                return Forbid();
 
             return View(donacija);
         }
@@ -135,8 +166,13 @@ namespace CharityFoundation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var user = await _userManager.GetUserAsync(User);
             var donacija = await _context.Donacije.FindAsync(id);
-            _context.Donacije.Remove(donacija!);
+
+            if (donacija == null || user == null || user.TipKorisnika != "Donator" || donacija.KorisnikId != user.Id)
+                return Forbid();
+
+            _context.Donacije.Remove(donacija);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

@@ -1,19 +1,22 @@
-@* Donacija/Index.cshtml - pregled i upravljanje donacijama donatora *@
 @model IEnumerable<CharityFoundation.Models.Donacija>
 
 @{
-    ViewData["Title"] = "Moje Donacije";
+    ViewData["Title"] = User.IsInRole("Administrator") ? "Sve Donacije" : "Moje Donacije";
 }
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Moje Donacije</h2>
-        <a asp-action="Create" class="btn btn-outline-primary">Nova Donacija</a>
+        <h2 class="text-primary">@ViewData["Title"]</h2>
+
+        @if (User.IsInRole("Donator"))
+        {
+            <a asp-action="Create" class="btn btn-outline-primary">Nova Donacija</a>
+        }
     </div>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">Nemate nijednu donaciju.</div>
+        <div class="alert alert-info">Nema donacija za prikaz.</div>
     }
     else
     {
@@ -38,10 +41,14 @@
                         <td>@donacija.DatumDonacije.ToString("dd.MM.yyyy")</td>
                         <td>
                             <a asp-action="Details" asp-route-id="@donacija.Id" class="btn btn-sm btn-outline-info">Detalji</a>
-                            <a asp-action="Edit" asp-route-id="@donacija.Id" class="btn btn-sm btn-outline-warning">Uredi</a>
-                            <form asp-action="Delete" asp-route-id="@donacija.Id" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Da li ste sigurni?')">Obriši</button>
-                            </form>
+
+                            @if (User.IsInRole("Donator"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@donacija.Id" class="btn btn-sm btn-outline-warning">Uredi</a>
+                                <form asp-action="Delete" asp-route-id="@donacija.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Da li ste sigurni?')">Obriši</button>
+                                </form>
+                            }
                         </td>
                     </tr>
                 }
