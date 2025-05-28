@@ -1,8 +1,27 @@
-@* Korisnik/Edit.cshtml - uređivanje korisnika *@
 @model CharityFoundation.Models.ApplicationUser
 
 @{
     ViewData["Title"] = "Uredi Korisnika";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f4f9ff;
+        }
+        .card {
+            border-radius: 1rem;
+        }
+        .card-header {
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+    </style>
 }
 
 <div class="container py-5">
@@ -13,7 +32,7 @@
                     <h4 class="mb-0">Uredi Korisnika</h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Edit">
+                    <form asp-action="Edit" method="post">
                         <input type="hidden" asp-for="Id" />
 
                         <div class="mb-3">
@@ -45,30 +64,13 @@
                             <span asp-validation-for="TipKorisnika" class="text-danger"></span>
                         </div>
 
-                        <button type="submit" class="btn btn-outline-primary">Spasi Promjene</button>
-                        <a asp-action="Index" class="btn btn-secondary ms-2">Nazad</a>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-outline-primary">Spasi Promjene</button>
+                            <a asp-action="Index" class="btn btn-secondary ms-2">Nazad</a>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
-
-@section Styles {
-    <style>
-        body {
-            background-color: #f4f9ff;
-        }
-        .card {
-            border-radius: 1rem;
-        }
-        .card-header {
-            border-top-left-radius: 1rem;
-            border-top-right-radius: 1rem;
-        }
-    </style>
-}

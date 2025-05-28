@@ -1,0 +1,37 @@
+@model CharityFoundation.Models.Donacija
+
+@{
+    ViewData["Title"] = "Detalji Donacije";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Detalji Donacije</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Vrsta pomoći</dt>
+                        <dd class="col-sm-8">@Model.VrstaPomoci</dd>
+
+                        <dt class="col-sm-4">Iznos</dt>
+                        <dd class="col-sm-8">@Model.Iznos.ToString("0.00") KM</dd>
+
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">@Model.Status</dd>
+
+                        <dt class="col-sm-4">Datum donacije</dt>
+                        <dd class="col-sm-8">@Model.DatumDonacije.ToString("dd.MM.yyyy")</dd>
+
+                        <dt class="col-sm-4">Donator</dt>
+                        <dd class="col-sm-8">@($"{Model.Korisnik?.Ime} {Model.Korisnik?.Prezime}")</dd>
+                    </dl>
+
+                    <a asp-action="Index" class="btn btn-secondary">Nazad</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -3,8 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using CharityFoundation.Data;
 using CharityFoundation.Models;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 // 🔐 Učitaj .env 
 Env.Load();

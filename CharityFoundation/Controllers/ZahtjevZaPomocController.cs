@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CharityFoundation.Data;
 using CharityFoundation.Models;
+using CharityFoundation.Models.Enums;
 
 namespace CharityFoundation.Controllers
 {
@@ -22,28 +23,27 @@ namespace CharityFoundation.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return Forbid();
+            if (user == null) return Forbid();
+
+            ViewBag.TipKorisnika = user.TipKorisnika;
 
             if (user.TipKorisnika == "Administrator")
             {
-                var sviZahtjevi = await _context.ZahtjeviZaPomoc
+                var zahtjevi = await _context.ZahtjeviZaPomoc
                     .Include(z => z.Korisnik)
                     .OrderByDescending(z => z.Datum)
                     .ToListAsync();
-
-                return View(sviZahtjevi);
+                return View(zahtjevi);
             }
 
             if (user.TipKorisnika == "PrimalacPomoci")
             {
-                var mojiZahtjevi = await _context.ZahtjeviZaPomoc
+                var zahtjevi = await _context.ZahtjeviZaPomoc
                     .Include(z => z.Korisnik)
                     .Where(z => z.KorisnikId == user.Id)
                     .OrderByDescending(z => z.Datum)
                     .ToListAsync();
-
-                return View(mojiZahtjevi);
+                return View(zahtjevi);
             }
 
             return Forbid();
@@ -52,7 +52,7 @@ namespace CharityFoundation.Controllers
         public async Task<IActionResult> Create()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null || user.TipKorisnika != "PrimalacPomoci")
+            if (user?.TipKorisnika != "PrimalacPomoci")
                 return Forbid();
 
             return View();
@@ -63,45 +63,43 @@ namespace CharityFoundation.Controllers
         public async Task<IActionResult> Create(ZahtjevZaPomoc zahtjev)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null || user.TipKorisnika != "PrimalacPomoci")
+            if (user?.TipKorisnika != "PrimalacPomoci")
                 return Forbid();
 
-            if (ModelState.IsValid)
-            {
-                zahtjev.KorisnikId = user.Id;
-                zahtjev.Status = Models.Enums.StatusZahtjeva.NaCekanju;
-                zahtjev.Datum = DateTime.Now;
+            zahtjev.KorisnikId = user.Id;
+            zahtjev.Status = StatusZahtjeva.NaCekanju;
+            zahtjev.Datum = DateTime.Now;
 
-                _context.Add(zahtjev);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+            _context.Add(zahtjev);
+            await _context.SaveChangesAsync();
 
-            return View(zahtjev);
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Details(int id)
         {
+            var user = await _userManager.GetUserAsync(User);
             var zahtjev = await _context.ZahtjeviZaPomoc
                 .Include(z => z.Korisnik)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(z => z.Id == id);
 
-            if (zahtjev == null)
-                return NotFound();
+            if (zahtjev == null) return NotFound();
+
+            // Samo primalac može gledati svoj zahtjev, admin sve
+            if (user.TipKorisnika == "PrimalacPomoci" && zahtjev.KorisnikId != user.Id)
+                return Forbid();
 
             return View(zahtjev);
         }
 
-        // Opcionalno: Admin može editovati zahtjeve
         public async Task<IActionResult> Edit(int id)
         {
             var user = await _userManager.GetUserAsync(User);
             var zahtjev = await _context.ZahtjeviZaPomoc.FindAsync(id);
 
-            if (zahtjev == null)
-                return NotFound();
+            if (zahtjev == null) return NotFound();
 
-            if (user?.TipKorisnika != "Administrator")
+            if (user.TipKorisnika == "PrimalacPomoci" && zahtjev.KorisnikId != user.Id)
                 return Forbid();
 
             return View(zahtjev);
@@ -112,18 +110,74 @@ namespace CharityFoundation.Controllers
         public async Task<IActionResult> Edit(int id, ZahtjevZaPomoc zahtjev)
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null || id != zahtjev.Id) return Forbid();
 
-            if (id != zahtjev.Id || user?.TipKorisnika != "Administrator")
+            var postojeci = await _context.ZahtjeviZaPomoc.AsNoTracking().FirstOrDefaultAsync(z => z.Id == id);
+            if (postojeci == null) return NotFound();
+
+            if (user.TipKorisnika == "PrimalacPomoci")
+            {
+                if (postojeci.KorisnikId != user.Id)
+                    return Forbid();
+
+                zahtjev.KorisnikId = user.Id;
+                zahtjev.Status = postojeci.Status;
+            }
+            else if (user.TipKorisnika == "Administrator")
+            {
+                zahtjev.KorisnikId = postojeci.KorisnikId;
+            }
+            else
+            {
                 return Forbid();
+            }
 
-            if (ModelState.IsValid)
+            try
             {
                 _context.Update(zahtjev);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
             }
 
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var zahtjev = await _context.ZahtjeviZaPomoc
+                .Include(z => z.Korisnik)
+                .FirstOrDefaultAsync(z => z.Id == id);
+
+            if (zahtjev == null)
+                return NotFound();
+
+            if (user.TipKorisnika == "PrimalacPomoci" && zahtjev.KorisnikId != user.Id)
+                return Forbid();
+
             return View(zahtjev);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var zahtjev = await _context.ZahtjeviZaPomoc.FindAsync(id);
+
+            if (zahtjev == null)
+                return NotFound();
+
+            if (user.TipKorisnika == "PrimalacPomoci" && zahtjev.KorisnikId != user.Id)
+                return Forbid();
+
+            _context.ZahtjeviZaPomoc.Remove(zahtjev);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

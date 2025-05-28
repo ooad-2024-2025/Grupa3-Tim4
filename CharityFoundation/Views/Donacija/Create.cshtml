@@ -1,4 +1,3 @@
-@* Donacija/Create.cshtml - unos nove donacije *@
 @model CharityFoundation.Models.Donacija
 
 @{
@@ -13,41 +12,24 @@
                     <h4 class="mb-0">Nova Donacija</h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Create">
+                    <form asp-action="Create" method="post">
                         <div class="mb-3">
                             <label asp-for="VrstaPomoci" class="form-label"></label>
                             <input asp-for="VrstaPomoci" class="form-control" />
-                            <span asp-validation-for="VrstaPomoci" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="Iznos" class="form-label"></label>
                             <input asp-for="Iznos" class="form-control" type="number" step="0.01" />
-                            <span asp-validation-for="Iznos" class="text-danger"></span>
                         </div>
-                        <button type="submit" class="btn btn-outline-primary">Doniraj</button>
-                        <a asp-action="Index" class="btn btn-secondary ms-2">Nazad</a>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">Nazad</a>
+                            <button type="submit" class="btn btn-outline-primary">Doniraj</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
-
-@section Styles {
-    <style>
-        body {
-            background-color: #f4f9ff;
-        }
-        .card {
-            border-radius: 1rem;
-        }
-        .card-header {
-            border-top-left-radius: 1rem;
-            border-top-right-radius: 1rem;
-        }
-    </style>
-}
