@@ -1,0 +1,56 @@
+@model CharityFoundation.Models.Donacija
+@using Microsoft.AspNetCore.Identity
+@using CharityFoundation.Models
+@using CharityFoundation.Models.Enums
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var isAdmin = user?.TipKorisnika == "Administrator";
+    ViewData["Title"] = "Uredi Donaciju";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0">Uredi Donaciju</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="VrstaPomoci" class="form-label"></label>
+                            <input asp-for="VrstaPomoci" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Iznos" class="form-label"></label>
+                            <input asp-for="Iznos" class="form-control" type="number" step="0.01" min="0" />
+                        </div>
+
+                        @if (isAdmin)
+                        {
+                            <div class="mb-3">
+                                <label asp-for="Status" class="form-label"></label>
+                                <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<StatusDonacije>()"></select>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">Nazad</a>
+                            <button type="submit" class="btn btn-outline-warning">Spremi izmjene</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,88 @@
+@model CharityFoundation.Models.Izvjestaj
+
+@{
+    ViewData["Title"] = "Detalji Izvještaja";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0"><i class="bi bi-file-earmark-text-fill"></i> Detalji Izvještaja</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Korisnik</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Korisnik != null)
+                    {
+                        @($"{Model.Korisnik.Ime} {Model.Korisnik.Prezime} ({Model.Korisnik.Email})")
+                    }
+                    else
+                    {
+                        <span class="text-muted fst-italic">Nepoznat korisnik</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Tip Korisnika</dt>
+                <dd class="col-sm-9">@Model.Korisnik?.TipKorisnika</dd>
+
+                <dt class="col-sm-3">Mjesec</dt>
+                <dd class="col-sm-9">@Model.Mjesec @Model.Godina</dd>
+
+                <dt class="col-sm-3">Datum Generisanja</dt>
+                <dd class="col-sm-9">@Model.Datum.ToString("dd.MM.yyyy HH:mm")</dd>
+
+                <dt class="col-sm-3">Opis</dt>
+                <dd class="col-sm-9">@Model.Opis</dd>
+
+                @if (Model.BrojDonacija > 0)
+                {
+                    <dt class="col-sm-3">Broj Donacija</dt>
+                    <dd class="col-sm-9">@Model.BrojDonacija</dd>
+
+                    <dt class="col-sm-3">Ukupna Vrijednost</dt>
+                    <dd class="col-sm-9">@Model.UkupnaVrijednost.ToString("F2") KM</dd>
+                }
+
+                @if (Model.BrojZahtjeva > 0)
+                {
+                    <dt class="col-sm-3">Broj Zahtjeva</dt>
+                    <dd class="col-sm-9">@Model.BrojZahtjeva</dd>
+                }
+
+                @if (Model.BrojAkcija > 0)
+                {
+                    <dt class="col-sm-3">Broj Akcija</dt>
+                    <dd class="col-sm-9">@Model.BrojAkcija</dd>
+                }
+            </dl>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Nazad
+                </a>
+                <a asp-action="Download" asp-route-id="@Model.Id" class="btn btn-outline-success">
+                    <i class="bi bi-file-earmark-pdf"></i> Preuzmi PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border-radius: 1rem;
+        }
+
+        .card-header {
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+    </style>
+}

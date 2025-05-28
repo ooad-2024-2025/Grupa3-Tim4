@@ -1,4 +1,26 @@
-﻿@* Views/Shared/_Layout.cshtml - Navigacija po ulogama *@
+﻿@* Views/Shared/_Layout.cshtml - Minimalna navigacija po TipKorisnika *@
+@using Microsoft.AspNetCore.Identity
+@using CharityFoundation.Models
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    string tipKorisnika = null;
+    if (User.Identity?.IsAuthenticated ?? false)
+    {
+        var user = await UserManager.GetUserAsync(User);
+        tipKorisnika = user?.TipKorisnika;
+    }
+
+    string dashboardAkcija = tipKorisnika switch
+    {
+        "Administrator" => "AdminDashboard",
+        "Donator" => "DonatorDashboard",
+        "PrimalacPomoci" => "PrimalacDashboard",
+        "Volonter" => "VolonterDashboard",
+        _ => "Index"
+    };
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,56 +54,9 @@
 
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
-                            @* Administrator *@
-                            if (User.IsInRole("Administrator"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Home" asp-action="AdminDashboard">Dashboard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Korisnik" asp-action="Index">Korisnici</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Donacija" asp-action="Index">Donacije</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Zahtjev" asp-action="Index">Zahtjevi</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Akcija" asp-action="Index">Akcije</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Izvjestaj" asp-action="Index">Izvještaji</a>
-                                </li>
-                            }
-                            else if (User.IsInRole("Donator"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Home" asp-action="DonatorDashboard">Dashboard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Donacija" asp-action="Index">Moje Donacije</a>
-                                </li>
-                            }
-                            else if (User.IsInRole("PrimalacPomoci"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Home" asp-action="PrimalacDashboard">Dashboard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Zahtjev" asp-action="Index">Moji Zahtjevi</a>
-                                </li>
-                            }
-                            else if (User.IsInRole("Volonter"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Home" asp-action="VolonterDashboard">Dashboard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Akcija" asp-action="Index">Moje Akcije</a>
-                                </li>
-                            }
-
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="@dashboardAkcija">Dashboard</a>
+                            </li>
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-link nav-link">Logout</button>

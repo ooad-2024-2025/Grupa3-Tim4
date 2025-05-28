@@ -1,0 +1,88 @@
+@model IEnumerable<CharityFoundation.Models.ZahtjevZaPomoc>
+
+@{
+    var tip = ViewBag.TipKorisnika as string;
+    ViewData["Title"] = tip == "Administrator" ? "Svi Zahtjevi" : "Moji Zahtjevi";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">@ViewData["Title"]</h2>
+
+        @if (tip == "PrimalacPomoci")
+        {
+            <a asp-action="Create" class="btn btn-outline-primary">
+                <i class="bi bi-plus-circle"></i> Novi Zahtjev
+            </a>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Nema dostupnih zahtjeva za prikaz.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Opis</th>
+                        <th>Urgentnost</th>
+                        <th>Status</th>
+                        <th>Datum</th>
+                        @if (tip == "Administrator")
+                        {
+                            <th>Korisnik</th>
+                        }
+                        <th>Akcije</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var zahtjev in Model)
+                    {
+                        <tr>
+                            <td>@zahtjev.Opis</td>
+                            <td>
+                                @(zahtjev.Urgentnost == 1 ? "Niska" :
+                                  zahtjev.Urgentnost == 2 ? "Srednja" :
+                                  zahtjev.Urgentnost == 3 ? "Visoka" : "Nepoznata")
+                            </td>
+                            <td><span class="badge bg-secondary">@zahtjev.Status</span></td>
+                            <td>@zahtjev.Datum.ToString("dd.MM.yyyy")</td>
+                            @if (tip == "Administrator")
+                            {
+                                <td>@zahtjev.Korisnik?.Ime @zahtjev.Korisnik?.Prezime</td>
+                            }
+                            <td>
+                                <a asp-action="Details" asp-route-id="@zahtjev.Id" class="btn btn-sm btn-outline-info me-1">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@zahtjev.Id" class="btn btn-sm btn-outline-warning me-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@zahtjev.Id" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h2 {
+            font-weight: 600;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+}

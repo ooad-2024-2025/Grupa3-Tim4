@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CharityFoundation.Data;
 using CharityFoundation.Models;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using System.Globalization;
 
 namespace CharityFoundation.Controllers
 {
@@ -43,13 +47,41 @@ namespace CharityFoundation.Controllers
             return View(moji);
         }
 
-        public async Task<IActionResult> Generisi()
+        [HttpGet]
+        public async Task<IActionResult> Create()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Forbid();
+            var admin = await _userManager.GetUserAsync(User);
+            if (admin == null || admin.TipKorisnika != "Administrator") return Forbid();
+
+            ViewBag.Korisnici = await _context.Users
+                .Where(u => u.TipKorisnika != "Administrator")
+                .Select(u => new { u.Id, ImePrezime = u.Ime + " " + u.Prezime + " (" + u.TipKorisnika + ")" })
+                .ToListAsync();
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(string korisnikId)
+        {
+            var admin = await _userManager.GetUserAsync(User);
+            if (admin == null || admin.TipKorisnika != "Administrator") return Forbid();
+
+            ApplicationUser user;
+
+            if (string.IsNullOrEmpty(korisnikId) || korisnikId == "admin")
+            {
+                user = admin;
+            }
+            else
+            {
+                user = await _context.Users.FirstOrDefaultAsync(u => u.Id == korisnikId);
+                if (user == null) return NotFound();
+            }
 
             var datum = DateTime.Now;
-            var mjesec = datum.ToString("MMMM");
+            var mjesec = datum.ToString("MMMM", new CultureInfo("bs-BA"));
             var godina = datum.Year;
 
             var izvjestaj = new Izvjestaj
@@ -62,29 +94,20 @@ namespace CharityFoundation.Controllers
 
             if (user.TipKorisnika == "Donator")
             {
-                var donacije = await _context.Donacije
-                    .Where(d => d.KorisnikId == user.Id)
-                    .ToListAsync();
-
+                var donacije = await _context.Donacije.Where(d => d.KorisnikId == user.Id).ToListAsync();
                 izvjestaj.BrojDonacija = donacije.Count;
                 izvjestaj.UkupnaVrijednost = donacije.Sum(d => d.Iznos);
-                izvjestaj.Opis = $"Izvještaj za Donatora – {donacije.Count} donacija ukupne vrijednosti {izvjestaj.UkupnaVrijednost} KM";
+                izvjestaj.Opis = $"Izvještaj za Donatora – {donacije.Count} donacija ukupne vrijednosti {izvjestaj.UkupnaVrijednost:F2} KM";
             }
             else if (user.TipKorisnika == "PrimalacPomoci")
             {
-                var zahtjevi = await _context.ZahtjeviZaPomoc
-                    .Where(z => z.KorisnikId == user.Id)
-                    .ToListAsync();
-
+                var zahtjevi = await _context.ZahtjeviZaPomoc.Where(z => z.KorisnikId == user.Id).ToListAsync();
                 izvjestaj.BrojZahtjeva = zahtjevi.Count;
                 izvjestaj.Opis = $"Izvještaj za Primaoca pomoći – {zahtjevi.Count} zahtjeva";
             }
             else if (user.TipKorisnika == "Volonter")
             {
-                var akcije = await _context.VolonterAkcije
-                    .Where(v => v.VolonterId == user.Id)
-                    .ToListAsync();
-
+                var akcije = await _context.VolonterAkcije.Where(v => v.VolonterId == user.Id).ToListAsync();
                 izvjestaj.BrojAkcija = akcije.Count;
                 izvjestaj.Opis = $"Izvještaj za Volontera – učestvovao na {akcije.Count} akcija";
             }
@@ -98,12 +121,7 @@ namespace CharityFoundation.Controllers
                 izvjestaj.BrojZahtjeva = sviZahtjevi.Count;
                 izvjestaj.BrojAkcija = sviVolonteri.Count;
                 izvjestaj.UkupnaVrijednost = sviDonatori.Sum(d => d.Iznos);
-
                 izvjestaj.Opis = $"Administratorski izvještaj – {sviDonatori.Count} donacija, {sviZahtjevi.Count} zahtjeva, {sviVolonteri.Count} učešća";
-            }
-            else
-            {
-                return Forbid();
             }
 
             _context.Izvjestaji.Add(izvjestaj);
@@ -118,17 +136,68 @@ namespace CharityFoundation.Controllers
                 .Include(i => i.Korisnik)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
+            if (izvjestaj == null) return NotFound();
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || (user.TipKorisnika != "Administrator" && izvjestaj.KorisnikId != user.Id))
+                return Forbid();
+
+            return View(izvjestaj);
+        }
+
+        public async Task<IActionResult> Download(int id)
+        {
+            var izvjestaj = await _context.Izvjestaji
+                .Include(i => i.Korisnik)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || (user.TipKorisnika != "Administrator" && izvjestaj?.KorisnikId != user.Id))
+                return Forbid();
+
             if (izvjestaj == null)
                 return NotFound();
 
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return Forbid();
+            var document = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(50);
+                    page.Header()
+                        .Text("Charity Foundation - Izvještaj")
+                        .FontSize(20).Bold().AlignCenter();
 
-            if (user.TipKorisnika == "Administrator" || izvjestaj.KorisnikId == user.Id)
-                return View(izvjestaj);
+                    page.Content().Column(col =>
+                    {
+                        col.Spacing(10);
+                        col.Item().Text($"Korisnik: {izvjestaj.Korisnik.Ime} {izvjestaj.Korisnik.Prezime}");
+                        col.Item().Text($"Tip: {izvjestaj.Korisnik.TipKorisnika}");
+                        col.Item().Text($"Mjesec: {izvjestaj.Mjesec} {izvjestaj.Godina}");
+                        col.Item().Text($"Datum: {izvjestaj.Datum:g}");
+                        col.Item().Text($"Opis: {izvjestaj.Opis}");
 
-            return Forbid();
+                        if (izvjestaj.BrojDonacija > 0)
+                            col.Item().Text($"Broj donacija: {izvjestaj.BrojDonacija}, Ukupna vrijednost: {izvjestaj.UkupnaVrijednost:F2} KM");
+
+                        if (izvjestaj.BrojZahtjeva > 0)
+                            col.Item().Text($"Broj zahtjeva: {izvjestaj.BrojZahtjeva}");
+
+                        if (izvjestaj.BrojAkcija > 0)
+                            col.Item().Text($"Broj akcija: {izvjestaj.BrojAkcija}");
+                    });
+
+                    page.Footer().AlignCenter().Text(txt =>
+                    {
+                        txt.Span("Charity Foundation © ").FontSize(10);
+                        txt.Span(DateTime.Now.Year.ToString()).FontSize(10);
+                    });
+                });
+            });
+
+            var pdfBytes = document.GeneratePdf();
+            var fileName = $"Izvjestaj_{izvjestaj.Korisnik.Ime}_{izvjestaj.Mjesec}_{izvjestaj.Godina}.pdf";
+
+            return File(pdfBytes, "application/pdf", fileName);
         }
     }
 }

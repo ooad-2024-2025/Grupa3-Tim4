@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Kontakt";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-primary fw-bold">Kontaktirajte nas</h1>
+        <p class="lead text-muted">Tu smo za sva vaša pitanja, sugestije i saradnju.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <h4 class="fw-bold mb-3"><i class="bi bi-info-circle text-primary"></i> Kontakt informacije</h4>
+            <ul class="list-unstyled text-muted">
+                <li class="mb-2"><i class="bi bi-envelope-fill text-primary me-2"></i> info@charity.com</li>
+                <li class="mb-2"><i class="bi bi-telephone-fill text-primary me-2"></i> +387 62 123 456</li>
+                <li><i class="bi bi-geo-alt-fill text-primary me-2"></i> Sarajevo, Bosna i Hercegovina</li>
+            </ul>
+
+            <div class="mt-4">
+                <h5 class="fw-bold mb-2">Radno vrijeme</h5>
+                <p class="text-muted">Ponedjeljak - Petak: 09:00 - 17:00</p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h4 class="fw-bold mb-3"><i class="bi bi-chat-dots-fill text-success"></i> Pošaljite poruku</h4>
+            <form>
+                <div class="mb-3">
+                    <label for="ime" class="form-label">Vaše ime</label>
+                    <input type="text" class="form-control" id="ime" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email adresa</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="poruka" class="form-label">Poruka</label>
+                    <textarea class="form-control" id="poruka" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-outline-success">
+                    <i class="bi bi-send-fill"></i> Pošalji
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        form .form-control {
+            border-radius: 0.5rem;
+        }
+
+        form button {
+            border-radius: 0.5rem;
+        }
+    </style>
+}

@@ -1,0 +1,71 @@
+@model CharityFoundation.Models.ZahtjevZaPomoc
+
+@{
+    ViewData["Title"] = "Detalji Zahtjeva";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0"><i class="bi bi-info-circle-fill"></i> Detalji Zahtjeva</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Korisnik</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Korisnik != null)
+                    {
+                        @($"{Model.Korisnik.Ime} {Model.Korisnik.Prezime} ({Model.Korisnik.Email})")
+                    }
+                    else
+                    {
+                        <span class="text-muted fst-italic">Nepoznat korisnik</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Opis</dt>
+                <dd class="col-sm-9">@Model.Opis</dd>
+
+                <dt class="col-sm-3">Datum</dt>
+                <dd class="col-sm-9">@Model.Datum.ToString("dd.MM.yyyy")</dd>
+
+                <dt class="col-sm-3">Urgentnost</dt>
+                <dd class="col-sm-9">
+                    @{
+                        var hitnost = Model.Urgentnost switch
+                        {
+                            1 => "Niska",
+                            2 => "Srednja",
+                            3 => "Visoka",
+                            _ => "Nepoznata"
+                        };
+                    }
+                    @hitnost
+                </dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">@Model.Status</dd>
+            </dl>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Nazad
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            border-radius: 1rem;
+        }
+        .card-header {
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+    </style>
+}
