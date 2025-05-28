@@ -4,6 +4,11 @@ Kompletna full-stack aplikacija za upravljanje humanitarnim donacijama, zahtjevi
 
 ---
 
+
+[Pregled aplikacije](https://charity555.netlify.app/)
+
+---
+
 ## 🔧 Tehnologije
 
 - **Backend**: ASP.NET Core MVC (.NET 8)
