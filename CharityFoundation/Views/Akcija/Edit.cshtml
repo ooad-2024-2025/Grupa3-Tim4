@@ -1,0 +1,87 @@
+@model CharityFoundation.Models.Akcija
+
+@{
+    ViewData["Title"] = "Uredi Akciju";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var volonteri = ViewBag.Volonteri as List<CharityFoundation.Models.ApplicationUser>;
+    var trenutnoDodijeljeni = Model.Ucesnici.FirstOrDefault()?.VolonterId;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0">Uredi Akciju</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="Naziv" class="form-label"></label>
+                            <input asp-for="Naziv" class="form-control" />
+                            <span asp-validation-for="Naziv" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Opis" class="form-label"></label>
+                            <textarea asp-for="Opis" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Opis" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Datum" class="form-label"></label>
+                            <input asp-for="Datum" class="form-control" type="date" />
+                            <span asp-validation-for="Datum" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="volonterId" class="form-label">Dodijeljeni Volonter</label>
+                            <select name="volonterId" class="form-select" required>
+                                <option value="">-- Odaberi volontera --</option>
+                                @foreach (var v in volonteri)
+                                {
+                                    if (v.Id == trenutnoDodijeljeni)
+                                    {
+                                        <option value="@v.Id" selected>@v.Ime @v.Prezime (@v.Email)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@v.Id">@v.Ime @v.Prezime (@v.Email)</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-outline-warning">
+                            <i class="bi bi-save"></i> Spremi Promjene
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">
+                            <i class="bi bi-arrow-left"></i> Nazad
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section Styles {
+    <style>
+        body {
+            background-color: #fefae0;
+        }
+        .card {
+            border-radius: 1rem;
+        }
+        .card-header {
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+    </style>
+}

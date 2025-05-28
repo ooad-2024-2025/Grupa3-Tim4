@@ -7,7 +7,7 @@ using CharityFoundation.Models;
 
 namespace CharityFoundation.Controllers
 {
-    [Authorize(Roles = "Administrator,Donator")]
+    [Authorize]
     public class DonacijaController : Controller
     {
         private readonly AppDbContext _context;
@@ -22,9 +22,7 @@ namespace CharityFoundation.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-                return Forbid();
+            if (user == null) return Forbid();
 
             if (user.TipKorisnika == "Administrator")
             {
@@ -32,7 +30,6 @@ namespace CharityFoundation.Controllers
                     .Include(d => d.Korisnik)
                     .OrderByDescending(d => d.DatumDonacije)
                     .ToListAsync();
-
                 return View(sveDonacije);
             }
 
@@ -43,7 +40,6 @@ namespace CharityFoundation.Controllers
                     .Where(d => d.KorisnikId == user.Id)
                     .OrderByDescending(d => d.DatumDonacije)
                     .ToListAsync();
-
                 return View(mojeDonacije);
             }
 
@@ -53,7 +49,7 @@ namespace CharityFoundation.Controllers
         public async Task<IActionResult> Create()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null || user.TipKorisnika != "Donator")
+            if (user?.TipKorisnika != "Donator")
                 return Forbid();
 
             return View();
@@ -64,87 +60,87 @@ namespace CharityFoundation.Controllers
         public async Task<IActionResult> Create(Donacija donacija)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null || user.TipKorisnika != "Donator")
+            if (user?.TipKorisnika != "Donator")
                 return Forbid();
 
-            if (ModelState.IsValid)
-            {
-                donacija.KorisnikId = user.Id;
-                donacija.Status = Models.Enums.StatusDonacije.NaCekanju;
-                donacija.DatumDonacije = DateTime.Now;
+            donacija.KorisnikId = user.Id;
+            donacija.Status = Models.Enums.StatusDonacije.NaCekanju;
+            donacija.DatumDonacije = DateTime.Now;
 
-                _context.Add(donacija);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+            _context.Add(donacija);
+            await _context.SaveChangesAsync();
 
-            return View(donacija);
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Details(int id)
-{
-    var user = await _userManager.GetUserAsync(User);
-    var donacija = await _context.Donacije
-        .Include(d => d.Korisnik)
-        .FirstOrDefaultAsync(m => m.Id == id);
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var donacija = await _context.Donacije
+                .Include(d => d.Korisnik)
+                .FirstOrDefaultAsync(d => d.Id == id);
 
-    if (donacija == null)
-        return NotFound();
+            if (donacija == null) return NotFound();
 
-    // ✅ Donator može samo svoje donacije gledati
-    if (user.TipKorisnika == "Donator" && donacija.KorisnikId != user.Id)
-        return Forbid();
+            if (user.TipKorisnika == "Donator" && donacija.KorisnikId != user.Id)
+                return Forbid();
 
-    // ✅ Administrator može sve vidjeti
-    return View(donacija);
-}
-
+            return View(donacija);
+        }
 
         public async Task<IActionResult> Edit(int id)
         {
             var user = await _userManager.GetUserAsync(User);
             var donacija = await _context.Donacije.FindAsync(id);
 
-            if (donacija == null)
-                return NotFound();
+            if (donacija == null) return NotFound();
 
-            if (user == null || user.TipKorisnika != "Donator" || donacija.KorisnikId != user.Id)
+            if (user.TipKorisnika == "Donator" && donacija.KorisnikId != user.Id)
                 return Forbid();
 
+            // ✅ Admin može uređivati bilo koju donaciju – npr. za promjenu statusa
             return View(donacija);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Donacija donacija)
-        {
-            var user = await _userManager.GetUserAsync(User);
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Edit(int id, Donacija donacija)
+{
+    var user = await _userManager.GetUserAsync(User);
+    if (user == null || id != donacija.Id)
+        return Forbid();
 
-            if (id != donacija.Id || user == null || user.TipKorisnika != "Donator")
-                return Forbid();
+    var postojeca = await _context.Donacije.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
+    if (postojeca == null)
+        return NotFound();
 
-            var postojeca = await _context.Donacije.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
-            if (postojeca == null || postojeca.KorisnikId != user.Id)
-                return Forbid();
+    if (user.TipKorisnika == "Donator")
+    {
+        if (postojeca.KorisnikId != user.Id)
+            return Forbid();
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    donacija.KorisnikId = user.Id;
-                    _context.Update(donacija);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    return NotFound();
-                }
+        donacija.KorisnikId = user.Id;
+        donacija.Status = postojeca.Status;
+    }
+    else if (user.TipKorisnika == "Administrator")
+    {
+        // Admin NE smije izgubiti FK
+        donacija.KorisnikId = postojeca.KorisnikId;
+    }
 
-                return RedirectToAction(nameof(Index));
-            }
+    try
+    {
+        _context.Update(donacija);
+        await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        return NotFound();
+    }
 
-            return View(donacija);
-        }
+    return RedirectToAction(nameof(Index));
+}
+
 
         public async Task<IActionResult> Delete(int id)
         {
@@ -156,7 +152,7 @@ namespace CharityFoundation.Controllers
             if (donacija == null)
                 return NotFound();
 
-            if (user == null || user.TipKorisnika != "Donator" || donacija.KorisnikId != user.Id)
+            if (user.TipKorisnika != "Donator" || donacija.KorisnikId != user.Id)
                 return Forbid();
 
             return View(donacija);
@@ -169,7 +165,7 @@ namespace CharityFoundation.Controllers
             var user = await _userManager.GetUserAsync(User);
             var donacija = await _context.Donacije.FindAsync(id);
 
-            if (donacija == null || user == null || user.TipKorisnika != "Donator" || donacija.KorisnikId != user.Id)
+            if (donacija == null || user.TipKorisnika != "Donator" || donacija.KorisnikId != user.Id)
                 return Forbid();
 
             _context.Donacije.Remove(donacija);

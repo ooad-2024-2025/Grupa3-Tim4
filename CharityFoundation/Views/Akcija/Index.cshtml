@@ -1,42 +1,72 @@
-@* Akcija/Index.cshtml - pregled volonterskih akcija za volontera *@
-@model IEnumerable<CharityFoundation.Models.VolonterAkcija>
+@model IEnumerable<CharityFoundation.Models.Akcija>
 
 @{
-    ViewData["Title"] = "Moje Akcije";
+    ViewData["Title"] = "Akcije";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var tip = ViewBag.TipKorisnika as string;
 }
 
 <div class="container py-4">
-    <h2 class="text-primary mb-4">Moje Volonterske Akcije</h2>
+    <h2 class="text-primary mb-4">
+        @(tip == "Administrator" ? "Sve Volonterske Akcije" : "Moje Volonterske Akcije")
+    </h2>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">Niste trenutno prijavljeni ni na jednu akciju.</div>
+        <div class="alert alert-info">
+            @(tip == "Administrator"
+                ? "Trenutno nema kreiranih akcija."
+                : "Niste trenutno prijavljeni ni na jednu akciju.")
+        </div>
     }
     else
     {
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
+            <table class="table table-hover table-bordered align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>Naziv Akcije</th>
+                        <th>Naziv</th>
                         <th>Opis</th>
                         <th>Datum</th>
-                        <th>Status</th>
+                        @if (tip == "Administrator")
+                        {
+                            <th style="width: 180px;">Akcije</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
-                @foreach (var ucesce in Model)
-                {
-                    <tr>
-                        <td>@ucesce.Akcija.Naziv</td>
-                        <td>@ucesce.Akcija.Opis</td>
-                        <td>@ucesce.Akcija.Datum.ToString("dd.MM.yyyy")</td>
-                        <td><span class="badge bg-secondary">@ucesce.StatusUcesca</span></td>
-                    </tr>
-                }
+                    @foreach (var akcija in Model)
+                    {
+                        <tr>
+                            <td>@akcija.Naziv</td>
+                            <td>@akcija.Opis</td>
+                            <td>@akcija.Datum.ToString("dd.MM.yyyy")</td>
+                            @if (tip == "Administrator")
+                            {
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@akcija.Id" class="btn btn-sm btn-outline-info me-1">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@akcija.Id" class="btn btn-sm btn-outline-warning me-1">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@akcija.Id" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            }
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
+    }
+
+    @if (tip == "Administrator")
+    {
+        <a asp-action="Create" class="btn btn-outline-primary mt-3">
+            <i class="bi bi-plus-circle"></i> Kreiraj novu akciju
+        </a>
     }
 </div>
 
@@ -45,10 +75,13 @@
         body {
             background-color: #f8f9fa;
         }
+
         h2 {
             font-weight: 600;
         }
-        .table th, .table td {
+
+        .table th,
+        .table td {
             vertical-align: middle;
         }
     </style>

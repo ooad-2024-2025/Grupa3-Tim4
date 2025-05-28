@@ -1,12 +1,30 @@
-@* Izvjestaj/Index.cshtml - pregled izvještaja po korisniku ili za sve korisnike (admin) *@
 @model IEnumerable<CharityFoundation.Models.Izvjestaj>
+@using Microsoft.AspNetCore.Identity
+@using CharityFoundation.Models
+@inject UserManager<ApplicationUser> UserManager
 
 @{
+    var currentUser = await UserManager.GetUserAsync(User);
+    var isAdmin = currentUser?.TipKorisnika == "Administrator";
     ViewData["Title"] = "Izvještaji";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container py-4">
-    <h2 class="text-primary mb-4">Izvještaji</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Izvještaji</h2>
+        <div class="btn-group">
+            <a asp-action="Generisi" class="btn btn-outline-primary">
+                <i class="bi bi-file-earmark-plus"></i> Za sebe
+            </a>
+            @if (isAdmin)
+            {
+                <a asp-action="Create" class="btn btn-outline-success">
+                    <i class="bi bi-people-fill"></i> Za korisnika
+                </a>
+            }
+        </div>
+    </div>
 
     @if (!Model.Any())
     {
@@ -15,42 +33,56 @@
     else
     {
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
+            <table class="table table-hover table-bordered align-middle">
                 <thead class="table-light">
                     <tr>
+                        <th>Datum</th>
                         <th>Mjesec</th>
-                        <th>Godina</th>
-                        <th>Datum Izvještaja</th>
+                        <th>Tip</th>
                         <th>Opis</th>
-                        <th>Ukupna Vrijednost</th>
-                        <th>Broj Stavki</th>
-                        <th>Korisnik</th>
+                        <th>Vrijednost</th>
+                        @if (isAdmin)
+                        {
+                            <th>Korisnik</th>
+                        }
+                        <th class="text-center">Akcije</th>
                     </tr>
                 </thead>
                 <tbody>
                 @foreach (var izvjestaj in Model)
                 {
+                    string tip = izvjestaj.BrojDonacija > 0 ? "Donacije"
+                               : izvjestaj.BrojZahtjeva > 0 ? "Zahtjevi"
+                               : izvjestaj.BrojAkcija > 0 ? "Akcije"
+                               : "Opšti";
+
                     <tr>
-                        <td>@izvjestaj.Mjesec</td>
-                        <td>@izvjestaj.Godina</td>
-                        <td>@izvjestaj.Datum.ToString("dd.MM.yyyy")</td>
+                        <td>@izvjestaj.Datum.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@izvjestaj.Mjesec @izvjestaj.Godina</td>
+                        <td>@tip</td>
                         <td>@izvjestaj.Opis</td>
-                        <td>@izvjestaj.UkupnaVrijednost.ToString("0.00") KM</td>
                         <td>
                             @if (izvjestaj.BrojDonacija > 0)
                             {
-                                @:Donacija: @izvjestaj.BrojDonacija
+                                @izvjestaj.UkupnaVrijednost.ToString("F2") @:KM
                             }
-                            else if (izvjestaj.Opis.ToLower().Contains("akcija"))
+                            else
                             {
-                                @:Akcija
-                            }
-                            else if (izvjestaj.Opis.ToLower().Contains("zahtjev"))
-                            {
-                                @:Zahtjev
+                                <span class="text-muted">/</span>
                             }
                         </td>
-                        <td>@izvjestaj.Korisnik?.Ime @izvjestaj.Korisnik?.Prezime</td>
+                        @if (isAdmin)
+                        {
+                            <td>@izvjestaj.Korisnik?.Ime @izvjestaj.Korisnik?.Prezime</td>
+                        }
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@izvjestaj.Id" class="btn btn-sm btn-outline-info me-1">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a asp-action="Download" asp-route-id="@izvjestaj.Id" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            </a>
+                        </td>
                     </tr>
                 }
                 </tbody>

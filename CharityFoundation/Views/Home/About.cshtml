@@ -1,8 +1,61 @@
 ﻿@{
-    ViewData["Title"] = "About Page";
+    ViewData["Title"] = "O nama";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">We are charity organisation</h1>
-    <p>paragraph</p>
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-primary fw-bold">O Nama</h1>
+        <p class="lead text-muted">Humanost. Transparentnost. Povezanost.</p>
+    </div>
+
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" class="img-fluid rounded shadow" alt="O nama" style="max-height: 300px;">
+        </div>
+        <div class="col-md-6">
+            <h4 class="fw-bold mb-3">Naša Misija</h4>
+            <p>
+                Charity Foundation je posvećena unapređenju života onih koji se suočavaju s teškim životnim okolnostima. 
+                Kroz digitalnu platformu povezujemo donatore, volontere i one kojima je pomoć najpotrebnija, na brz, pouzdan i transparentan način.
+            </p>
+
+            <h4 class="fw-bold mt-4 mb-3">Naša Vizija</h4>
+            <p>
+                Vizija našeg tima je kreirati zajednicu koja ne ostavlja nikoga iza sebe. 
+                Solidarnost i tehnologija - mozemo probati napraviti bolje uslove za sve.
+            </p>
+        </div>
+    </div>
+
+    <div class="row mt-5 text-center">
+        <div class="col-md-4 mb-4">
+            <h5 class="fw-bold text-primary"><i class="bi bi-globe"></i> Povezujemo ljude</h5>
+            <p class="text-muted">Korisnici mogu jednostavno registrovati svoje potrebe ili ponuditi pomoć.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+            <h5 class="fw-bold text-success"><i class="bi bi-shield-check"></i> Gradimo povjerenje</h5>
+            <p class="text-muted">Transparentnost svakog koraka – od zahtjeva do realizacije pomoći.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+            <h5 class="fw-bold text-warning"><i class="bi bi-lightning-charge"></i> Brzo djelujemo</h5>
+            <p class="text-muted">Svaka minuta može značiti mnogo – zato smo ovdje kada je najpotrebnije.</p>
+        </div>
+    </div>
 </div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border-radius: 1rem;
+        }
+
+        .img-fluid {
+            max-height: 300px;
+        }
+    </style>
+}
