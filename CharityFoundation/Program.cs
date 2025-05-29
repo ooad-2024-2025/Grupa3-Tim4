@@ -1,20 +1,16 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using DotNetEnv;
 using CharityFoundation.Data;
 using CharityFoundation.Models;
 using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ✅ QuestPDF licenca
 QuestPDF.Settings.License = LicenseType.Community;
 
-// 🔐 Učitaj .env 
-Env.Load();
-
-// 📦 Konekcija na bazu
-var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION")
-    ?? throw new InvalidOperationException("Environment variable 'DB_CONNECTION' not found.");
+// ✅ Konekcija na bazu iz appsettings.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -24,7 +20,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
-    .AddEntityFrameworkStores<AppDbContext>();
+.AddEntityFrameworkStores<AppDbContext>();
 
 // ✅ MVC + Razor Pages (potrebno za Identity UI)
 builder.Services.AddControllersWithViews();
@@ -38,7 +34,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-    CreateAdminUser(userManager).Wait(); // <--- blokira dok se ne završi
+    CreateAdminUser(userManager).Wait();
 }
 
 static async Task CreateAdminUser(UserManager<ApplicationUser> userManager)
@@ -73,7 +69,6 @@ static async Task CreateAdminUser(UserManager<ApplicationUser> userManager)
         }
     }
 }
-
 
 // 🔧 Middleware pipeline
 if (!app.Environment.IsDevelopment())
