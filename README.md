@@ -4,8 +4,15 @@ Kompletna full-stack aplikacija za upravljanje humanitarnim donacijama, zahtjevi
 
 ---
 
-
+## Screenshots
 [Pregled aplikacije](https://charity555.netlify.app/)
+
+## Deployment
+[Live deployed app](http://charity555-001-site1.ntempurl.com/)
+
+`Username:` 11244910
+
+`Password:` 60-dayfreetrial
 
 ---
 
