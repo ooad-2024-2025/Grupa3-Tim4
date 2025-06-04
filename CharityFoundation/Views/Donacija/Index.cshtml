@@ -10,6 +10,15 @@
 }
 
 <div class="container py-4">
+    @if (TempData["Uspjeh"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["Uspjeh"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zatvori"></button>
+        </div>
+    }
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary">@ViewData["Title"]</h2>
 

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using CharityFoundation.Data;
 using CharityFoundation.Models;
+using CharityFoundation.Services;
 using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     options.SignIn.RequireConfirmedAccount = false;
 })
 .AddEntityFrameworkStores<AppDbContext>();
+
+// ✅ Dodaj Email servis
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 // ✅ MVC + Razor Pages (potrebno za Identity UI)
 builder.Services.AddControllersWithViews();
@@ -86,13 +91,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // 🔐 obavezno
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages(); // ✅ omogućava Identity UI
+app.MapRazorPages();
 
 app.Run();

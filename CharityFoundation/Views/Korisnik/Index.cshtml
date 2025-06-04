@@ -3,19 +3,53 @@
 @{
     ViewData["Title"] = "Korisnici";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var tip = ViewBag.Tip as string ?? "";
+    var donacije = ViewBag.Donacije as Dictionary<string, double> ?? new();
+    int rank = 1;
 }
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Svi Korisnici</h2>
+        <h2 class="text-primary">Korisnici</h2>
         <a asp-action="Create" class="btn btn-outline-primary">
             <i class="bi bi-person-plus"></i> Dodaj novog korisnika
         </a>
     </div>
 
+    <form method="get" asp-action="Index" class="mb-4">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="tip" value="" id="svi" onchange="this.form.submit()" @(string.IsNullOrEmpty(tip) ? "checked" : "")>
+                <label class="form-check-label" for="svi"><i class="bi bi-people"></i> Svi korisnici</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="tip" value="Administrator" id="admin" onchange="this.form.submit()" @(tip == "Administrator" ? "checked" : "")>
+                <label class="form-check-label" for="admin"><i class="bi bi-shield-lock"></i> Admini</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="tip" value="Donator" id="donator" onchange="this.form.submit()" @(tip == "Donator" ? "checked" : "")>
+                <label class="form-check-label" for="donator"><i class="bi bi-cash-coin"></i> Donatori</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="tip" value="PrimalacPomoci" id="primalac" onchange="this.form.submit()" @(tip == "PrimalacPomoci" ? "checked" : "")>
+                <label class="form-check-label" for="primalac"><i class="bi bi-person-heart"></i> Primaoci pomoći</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="tip" value="Volonter" id="volonter" onchange="this.form.submit()" @(tip == "Volonter" ? "checked" : "")>
+                <label class="form-check-label" for="volonter"><i class="bi bi-person-arms-up"></i> Volonteri</label>
+            </div>
+        </div>
+    </form>
+
+    @if (tip == "Donator")
+    {
+        <h2 class="text-success mt-4">🏆 Rang lista donatora</h2>
+        <p class="text-muted">Donatori su sortirani prema ukupnoj vrijednosti svojih donacija.</p>
+    }
+
     @if (!Model.Any())
     {
-        <div class="alert alert-warning">Nema registrovanih korisnika.</div>
+        <div class="alert alert-warning">Nema registrovanih korisnika za odabranu kategoriju.</div>
     }
     else
     {
@@ -23,32 +57,49 @@
             <table class="table table-hover table-bordered align-middle">
                 <thead class="table-light">
                     <tr>
+                        @if (tip == "Donator")
+                        {
+                            <th>#</th>
+                        }
                         <th>Ime i Prezime</th>
                         <th>Email</th>
                         <th>Tip korisnika</th>
+                        @if (tip == "Donator")
+                        {
+                            <th>Ukupno donirano</th>
+                        }
                         <th style="width: 180px;">Akcije</th>
                     </tr>
                 </thead>
                 <tbody>
-                @foreach (var korisnik in Model)
-                {
-                    <tr>
-                        <td>@korisnik.Ime @korisnik.Prezime</td>
-                        <td>@korisnik.Email</td>
-                        <td>@korisnik.TipKorisnika</td>
-                        <td>
-                            <a asp-action="Details" asp-route-id="@korisnik.Id" class="btn btn-sm btn-outline-info me-1" title="Detalji">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a asp-action="Edit" asp-route-id="@korisnik.Id" class="btn btn-sm btn-outline-warning me-1" title="Uredi">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@korisnik.Id" class="btn btn-sm btn-outline-danger" title="Obriši">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                }
+                    @foreach (var korisnik in Model)
+                    {
+                        <tr>
+                            @if (tip == "Donator")
+                            {
+                                <td>@rank</td>
+                            }
+                            <td>@korisnik.Ime @korisnik.Prezime</td>
+                            <td>@korisnik.Email</td>
+                            <td>@korisnik.TipKorisnika</td>
+                            @if (tip == "Donator")
+                            {
+                                <td>@(donacije.ContainsKey(korisnik.Id) ? donacije[korisnik.Id].ToString("0.00") + " KM" : "0.00 KM")</td>
+                                rank++;
+                            }
+                            <td>
+                                <a asp-action="Details" asp-route-id="@korisnik.Id" class="btn btn-sm btn-outline-info me-1" title="Detalji">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@korisnik.Id" class="btn btn-sm btn-outline-warning me-1" title="Uredi">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@korisnik.Id" class="btn btn-sm btn-outline-danger" title="Obriši">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>

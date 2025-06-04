@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CharityFoundation.Models;
+using CharityFoundation.Data;
 
 namespace CharityFoundation.Controllers
 {
@@ -10,20 +11,50 @@ namespace CharityFoundation.Controllers
     public class KorisnikController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly AppDbContext _context;
 
-        public KorisnikController(UserManager<ApplicationUser> userManager)
+        public KorisnikController(UserManager<ApplicationUser> userManager, AppDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
-        // ✅ Prikaz svih korisnika (samo Administrator po TipKorisnika)
-        public async Task<IActionResult> Index()
+        // ✅ Prikaz svih korisnika sa mogućnošću filtracije i rang liste donatora
+        public async Task<IActionResult> Index(string? tip)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser?.TipKorisnika != "Administrator")
                 return Forbid();
 
+            ViewBag.Tip = tip;
+
             var korisnici = await _userManager.Users.ToListAsync();
+
+            if (!string.IsNullOrEmpty(tip))
+            {
+                korisnici = korisnici
+                    .Where(k => k.TipKorisnika == tip)
+                    .ToList();
+
+                if (tip == "Donator")
+                {
+                    var donacije = await _context.Donacije
+                        .GroupBy(d => d.KorisnikId)
+                        .Select(g => new
+                        {
+                            KorisnikId = g.Key,
+                            UkupniIznos = g.Sum(d => d.Iznos)
+                        })
+                        .ToDictionaryAsync(g => g.KorisnikId, g => g.UkupniIznos);
+
+                    korisnici = korisnici
+                        .OrderByDescending(k => donacije.ContainsKey(k.Id) ? donacije[k.Id] : 0)
+                        .ToList();
+
+                    ViewBag.Donacije = donacije;
+                }
+            }
+
             return View(korisnici);
         }
 
@@ -53,7 +84,7 @@ namespace CharityFoundation.Controllers
             return View(korisnik);
         }
 
-        // ✅ Spremanje izmjena
+        // ✅ Spremanje izmjena korisnika
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
@@ -82,7 +113,7 @@ namespace CharityFoundation.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ✅ Prikaz forme za brisanje
+        // ✅ Prikaz forme za brisanje korisnika
         public async Task<IActionResult> Delete(string id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -111,7 +142,7 @@ namespace CharityFoundation.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ✅ Forma za dodavanje novog korisnika
+        // ✅ Prikaz forme za kreiranje novog korisnika
         public async Task<IActionResult> Create()
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -121,7 +152,7 @@ namespace CharityFoundation.Controllers
             return View();
         }
 
-        // ✅ Dodavanje korisnika
+        // ✅ Dodavanje novog korisnika
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser model, string password)
