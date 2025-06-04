@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using CharityFoundation.Data;
 using CharityFoundation.Models;
@@ -12,11 +13,13 @@ namespace CharityFoundation.Controllers
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public DonacijaController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public DonacijaController(AppDbContext context, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         public async Task<IActionResult> Index()
@@ -70,6 +73,23 @@ namespace CharityFoundation.Controllers
             _context.Add(donacija);
             await _context.SaveChangesAsync();
 
+            // ✉️ Slanje email potvrde
+            var subject = "Potvrda donacije";
+            var message = $@"
+                <h3>Poštovani {user.Ime} {user.Prezime},</h3>
+                <p>Vaša donacija je uspješno zaprimljena:</p>
+                <ul>
+                    <li><strong>Iznos:</strong> {donacija.Iznos} KM</li>
+                    <li><strong>Vrsta pomoći:</strong> {donacija.VrstaPomoci}</li>
+                    <li><strong>Datum:</strong> {donacija.DatumDonacije:dd.MM.yyyy HH:mm}</li>
+                </ul>
+                <p>Status donacije: <strong>{donacija.Status}</strong></p>
+                <hr/>
+                <p>Hvala Vam na ukazanom povjerenju.<br/><i>Charity Foundation</i></p>";
+
+            await _emailSender.SendEmailAsync(user.Email!, subject, message);
+
+            TempData["Uspjeh"] = "Donacija je poslata. Dobit ćete potvrdu na email.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -98,49 +118,46 @@ namespace CharityFoundation.Controllers
             if (user.TipKorisnika == "Donator" && donacija.KorisnikId != user.Id)
                 return Forbid();
 
-            // ✅ Admin može uređivati bilo koju donaciju – npr. za promjenu statusa
             return View(donacija);
         }
 
         [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Edit(int id, Donacija donacija)
-{
-    var user = await _userManager.GetUserAsync(User);
-    if (user == null || id != donacija.Id)
-        return Forbid();
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Donacija donacija)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || id != donacija.Id)
+                return Forbid();
 
-    var postojeca = await _context.Donacije.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
-    if (postojeca == null)
-        return NotFound();
+            var postojeca = await _context.Donacije.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
+            if (postojeca == null)
+                return NotFound();
 
-    if (user.TipKorisnika == "Donator")
-    {
-        if (postojeca.KorisnikId != user.Id)
-            return Forbid();
+            if (user.TipKorisnika == "Donator")
+            {
+                if (postojeca.KorisnikId != user.Id)
+                    return Forbid();
 
-        donacija.KorisnikId = user.Id;
-        donacija.Status = postojeca.Status;
-    }
-    else if (user.TipKorisnika == "Administrator")
-    {
-        // Admin NE smije izgubiti FK
-        donacija.KorisnikId = postojeca.KorisnikId;
-    }
+                donacija.KorisnikId = user.Id;
+                donacija.Status = postojeca.Status;
+            }
+            else if (user.TipKorisnika == "Administrator")
+            {
+                donacija.KorisnikId = postojeca.KorisnikId;
+            }
 
-    try
-    {
-        _context.Update(donacija);
-        await _context.SaveChangesAsync();
-    }
-    catch (DbUpdateConcurrencyException)
-    {
-        return NotFound();
-    }
+            try
+            {
+                _context.Update(donacija);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
 
-    return RedirectToAction(nameof(Index));
-}
-
+            return RedirectToAction(nameof(Index));
+        }
 
         public async Task<IActionResult> Delete(int id)
         {
