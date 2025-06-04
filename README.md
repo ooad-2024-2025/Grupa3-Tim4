@@ -14,15 +14,11 @@ Kompletna full-stack aplikacija za upravljanje humanitarnim donacijama, zahtjevi
 
 `Password:` 60-dayfreetrial
 
-⚠ Napomena o prijavi
+Zbog tehničkog problema na hostingu molimo da prijavu i registraciju vršite preko `Account` rute za `Login` odnosno `Register`.
 
-Trenutno postoji tehnički problem na hostingu koji utiče na automatsko preusmjeravanje nakon prijave. Zbog ograničenja u obradi async/await funkcionalnosti, automatski prijelaz na stranicu za prijavu možda neće raditi ispravno.
+[Login](http://charity555-001-site1.ntempurl.com/Account/Login)
 
-📌 Molimo Vas da se prijavite direktno putem sljedeće adrese:
-
-http://charity555-001-site1.ntempurl.com/Account/Login
-
-Radimo na trajnom rješenju i zahvaljujemo na razumijevanju.
+[Register](http://charity555-001-site1.ntempurl.com/Account/Register)
 
 ---
 
