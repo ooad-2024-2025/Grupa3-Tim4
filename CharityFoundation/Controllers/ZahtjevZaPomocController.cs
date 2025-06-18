@@ -105,45 +105,52 @@ namespace CharityFoundation.Controllers
             return View(zahtjev);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ZahtjevZaPomoc zahtjev)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null || id != zahtjev.Id) return Forbid();
+        
+       [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Edit(int id, ZahtjevZaPomoc zahtjev)
+{
+    var user = await _userManager.GetUserAsync(User);
+    if (user == null || id != zahtjev.Id)
+        return Forbid();
 
-            var postojeci = await _context.ZahtjeviZaPomoc.AsNoTracking().FirstOrDefaultAsync(z => z.Id == id);
-            if (postojeci == null) return NotFound();
+    var postojeci = await _context.ZahtjeviZaPomoc.AsNoTracking().FirstOrDefaultAsync(z => z.Id == id);
+    if (postojeci == null)
+        return NotFound();
 
-            if (user.TipKorisnika == "PrimalacPomoci")
-            {
-                if (postojeci.KorisnikId != user.Id)
-                    return Forbid();
+    // ✅ Dozvola pristupa
+    if (user.TipKorisnika == "PrimalacPomoci" && postojeci.KorisnikId != user.Id)
+        return Forbid();
 
-                zahtjev.KorisnikId = user.Id;
-                zahtjev.Status = postojeci.Status;
-            }
-            else if (user.TipKorisnika == "Administrator")
-            {
-                zahtjev.KorisnikId = postojeci.KorisnikId;
-            }
-            else
-            {
-                return Forbid();
-            }
+    // ✅ Ručno mapiraj izmjene
+    zahtjev.KorisnikId = postojeci.KorisnikId;
+    zahtjev.Datum = postojeci.Datum;
 
-            try
-            {
-                _context.Update(zahtjev);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return NotFound();
-            }
+    if (user.TipKorisnika == "Administrator")
+    {
+        // Admin može mijenjati status
+        // već postavljeno preko bindinga
+    }
+    else
+    {
+        // Obični korisnik ne može mijenjati status
+        zahtjev.Status = postojeci.Status;
+    }
 
-            return RedirectToAction(nameof(Index));
-        }
+    try
+    {
+        _context.Entry(zahtjev).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        return NotFound();
+    }
+
+    return RedirectToAction(nameof(Index));
+}
+
+
 
         public async Task<IActionResult> Delete(int id)
         {

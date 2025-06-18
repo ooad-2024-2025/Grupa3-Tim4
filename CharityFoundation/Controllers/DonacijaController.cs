@@ -122,42 +122,46 @@ namespace CharityFoundation.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Donacija donacija)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null || id != donacija.Id)
-                return Forbid();
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Edit(int id, Donacija donacija)
+{
+    var user = await _userManager.GetUserAsync(User);
+    if (user == null || id != donacija.Id)
+        return Forbid();
 
-            var postojeca = await _context.Donacije.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
-            if (postojeca == null)
-                return NotFound();
+    var postojeca = await _context.Donacije.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
+    if (postojeca == null)
+        return NotFound();
 
-            if (user.TipKorisnika == "Donator")
-            {
-                if (postojeca.KorisnikId != user.Id)
-                    return Forbid();
+    if (user.TipKorisnika == "Donator")
+    {
+        if (postojeca.KorisnikId != user.Id)
+            return Forbid();
 
-                donacija.KorisnikId = user.Id;
-                donacija.Status = postojeca.Status;
-            }
-            else if (user.TipKorisnika == "Administrator")
-            {
-                donacija.KorisnikId = postojeca.KorisnikId;
-            }
+        donacija.KorisnikId = user.Id;
+        donacija.Status = postojeca.Status;
+    }
+    else if (user.TipKorisnika == "Administrator")
+    {
+        donacija.KorisnikId = postojeca.KorisnikId;
+    }
 
-            try
-            {
-                _context.Update(donacija);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return NotFound();
-            }
+    // ✅ Sačuvaj izvorni datum donacije
+    donacija.DatumDonacije = postojeca.DatumDonacije;
 
-            return RedirectToAction(nameof(Index));
-        }
+    try
+    {
+        _context.Update(donacija);
+        await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        return NotFound();
+    }
+
+    return RedirectToAction(nameof(Index));
+}
+
 
         public async Task<IActionResult> Delete(int id)
         {
